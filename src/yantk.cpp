@@ -37,7 +37,7 @@ public:
     void ReadAscii(const std::string& fileName)
     {
         std::ifstream ifs(fileName);
-        if (!ifstream)
+        if (!ifs)
         {
             std::ostringstream ostr;
             ostr << "Could not open file " << fileName << " for read";
@@ -49,7 +49,7 @@ public:
         while (std::getline(ifs, currLine))
         {
             ++lineCnt;
-            if (curLine[0] == '#') continue;
+            if (currLine[0] == '#') continue;
             std::istringstream istr(currLine);
             int colCnt = 0;
             T curr;
@@ -65,7 +65,7 @@ public:
             }
             if (colCnt != lastCnt)
             {
-                ostringstream err;
+                std::ostringstream err;
                 err << "Count of elements in line " << lineCnt << "(" << colCnt <<
                     ") !=  count in prev line(s) (" << lastCnt << ")";
                 throw (std::runtime_error(err.str().c_str()));
@@ -73,7 +73,7 @@ public:
         }
         cols = lastCnt;
         rows = data.size() / cols;
-        std::assert(data.size() % rows == 0);
+        assert(data.size() % rows == 0);
     }
 
     Matrix() { rows = 0; cols = 0; ownMemory = false; name = "anonymous"; }
@@ -401,7 +401,6 @@ void ff_scratch_network()
     */
 
 
-    return 0;
 }
 
 
@@ -450,7 +449,6 @@ int main(int argc, char** argv)
     bool scaleFeatures = false;
     std::vector<Matrix<float>> WEIGHTS;
     bool init_weights = true;
-    float learn_rate = 0.1;
 
     int trainRowCnt = TRAIN.rows;
     int testRowCnt = TEST.rows;
@@ -460,8 +458,8 @@ int main(int argc, char** argv)
     float SCALERATIO = -100;
     float MINUNSCALED = -100;
 
-    TR_X = GetFeatures(TRAIN);
-    TE_X = GetFeatures(TEST);
+    //TR_X = GetFeatures(TRAIN);
+    //TE_X = GetFeatures(TEST);
 
 
 
