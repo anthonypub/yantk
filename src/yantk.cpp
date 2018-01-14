@@ -210,9 +210,11 @@ int main(int argc, char** argv)
     //are in columns instead of in rows, but I don't really see how that's advantageous so will probably switch
     //to the more intuitive setup once I've verified that it works.
     Matrix<float> TRAIN;
-    TRAIN.ReadAscii(argv[1]);
+    std::ifstream ifsTrain(argv[1]);
+    TRAIN.ReadAscii(ifsTrain);
     Matrix<float> TEST;
-    TEST.ReadAscii(argv[2]);
+    std::ifstream ifsTest(argv[2]);
+    TEST.ReadAscii(ifsTest);
 
     //TODO: Read in from file(s)
     float learn_rate = 0.1;

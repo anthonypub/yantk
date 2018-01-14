@@ -23,14 +23,11 @@ public:
     bool ownMemory;
     std::string name;
 
-    void ReadAscii(const std::string& fileName)
+    void ReadAscii(std::istream& ifs)
     {
-        std::ifstream ifs(fileName);
         if (!ifs)
         {
-            std::ostringstream ostr;
-            ostr << "Could not open file " << fileName << " for read";
-            throw std::runtime_error(ostr.str().c_str());
+            throw std::runtime_error("bad stream");
         }
         int lastCnt = -1;
         std::string currLine;
@@ -42,7 +39,7 @@ public:
             std::istringstream istr(currLine);
             int colCnt = 0;
             T curr;
-            while (istr)
+            while (istr && !istr.eof())
             {
                 istr >> curr;
                 data.push_back(curr);
@@ -159,6 +156,26 @@ public:
     {
         return (r * cols) + c;
     }
+
+    void GetSubmatrix(int rowBegin, int rowCnt, int colBegin, int colCnt, 
+        Matrix<T>& out)
+    {
+        assert(rowCnt > 0); 
+        assert(colCnt > 0); 
+        assert(rowBegin >= 0);
+        assert(rowBegin >= 0);
+        out.rows=rowCnt;
+        out.cols=colCnt;
+        out.data.resize(rowCnt * colCnt);
+        for(int i=rowBegin; i < rowBegin + rowCnt; ++i)
+        {
+            for(int j=colBegin; j < colBegin + colCnt; ++j)
+            {
+               out.set(i - rowBegin, j - colBegin, get(i, j)); 
+            }
+        }
+    }
+
 
     void Transpose(Matrix<T>& outMatrix) const
     {
