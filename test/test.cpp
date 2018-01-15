@@ -133,4 +133,17 @@ TEST_CASE ("Matrix class", "[Matrix]")
         REQUIRE(single.get(1, 1) == 1.0f);
     }
 
+    SECTION ("Randomize")
+    {
+        Matrix<float> randomized(2, 2);
+        Matrix<float>::RandInitMatrix(-0.5f, 3.0f, randomized);
+        for(int i=0; i < randomized.data.size(); ++i)
+        {
+            REQUIRE(randomized.data[i] >= -0.5f);
+            REQUIRE(randomized.data[i] <= 3.0f);
+        }
+    }
+
+
+
 }

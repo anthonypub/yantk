@@ -62,6 +62,17 @@ public:
         assert(data.size() % rows == 0);
     }
 
+    static void RandInitMatrix(T min, T max, Matrix<T>& randomizeMe)
+    {
+            for (int i = 0; i < randomizeMe.data.size(); ++i)
+            {
+                    T r = (T)rand() / (T)RAND_MAX;
+                    T diff = max - min;
+                    r *= diff;
+                    randomizeMe.data[i] = min + r;
+            }
+    }
+
     Matrix() { rows = 0; cols = 0; ownMemory = false; name = "anonymous"; }
 
     Matrix(int r, int c, T* d)
@@ -72,6 +83,14 @@ public:
         data.insert(data.begin(), d, d + (r*c));
         name = "anonymous";
     }
+
+    Matrix(int r, int c)
+    {
+        rows = r;
+        cols = c;
+        data.resize(r * c);
+        name="anonymous";
+    }   
 
     Matrix(int r, int c, std::vector<T> d)
     {

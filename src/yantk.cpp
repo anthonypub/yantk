@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <exception>
 #include "matrix.h"
 
 template<typename T> void RandInitMatrix(Matrix<T>& randomizeMe, T min, T max)
@@ -18,44 +19,6 @@ template<typename T> void RandInitMatrix(Matrix<T>& randomizeMe, T min, T max)
         r *= diff;
         randomizeMe.data[i] = min + r;
     }
-}
-
-
-//Not efficient.
-template<typename T>void ReadMatrix(std::string fn, Matrix<T>& mat)
-{
-    std::ifstream ifs(fn);
-    std::string currLine;
-    T fCurr;
-    int numRows = 0;
-    int numCols = -1;
-    while (std::getline(ifs, currLine))
-    {
-        int currCols = 0;
-        std::istringstream istr(currLine, std::ios_base::in);
-        while (istr >> fCurr)
-        {
-            mat.data.push_back(fCurr);
-            ++currCols;
-        }
-        if (numCols != -1 && currCols != numCols)
-        {
-            throw std::runtime_error("row count mismatch");
-        }
-        numCols = currCols;
-        ++numRows;
-        mat.cols = numCols;
-        mat.rows = numRows;
-    }
-}
-/*
-def sigmoid(x) :
-    return 1 / (1 + np.exp(-x))
-    */
-
-template<typename T> T scalarsigmoid(T t)
-{
-    return (T)1 / ((T)1 + exp(-t));
 }
 
 template<typename T> void forward(Matrix<T>& input, const std::vector<Matrix<T>>& weights, /*out*/ 
@@ -201,6 +164,7 @@ class Optimizer //e.g. SGD, AdaGrad, ADAM, etc.
 
 int main(int argc, char** argv)
 {
+    srand(42);
     if (argc != 3)
     {
         std::cerr << "Usage: yantk TRAIN TEST" << std::endl;
@@ -211,10 +175,10 @@ int main(int argc, char** argv)
     //to the more intuitive setup once I've verified that it works.
     Matrix<float> train;
     std::ifstream ifsTrain(argv[1]);
-    TRAIN.ReadAscii(ifsTrain);
+    train.ReadAscii(ifsTrain);
     Matrix<float> test;
     std::ifstream ifsTest(argv[2]);
-    TEST.ReadAscii(ifsTest);
+    test.ReadAscii(ifsTest);
 
     //TODO: Read in from file(s)
     float learn_rate = 0.1;
@@ -235,10 +199,56 @@ int main(int argc, char** argv)
 
     //TR_X = GetFeatures(TRAIN);
     //TE_X = GetFeatures(TEST);
+    Matrix<float> tr_x_pre;
+    train.GetSubmatrix(0, train.rows - 1, 0, train.cols - 1, tr_x_pre);
+    Matrix<float> te_x_pre;
+    train.GetSubmatrix(0, test.rows - 1, 0, test.cols - 1, te_x_pre);
+
+    //Add bias column
+    
+    Matrix<float> trainOnes;
+    Matrix<float>::GetSingleValMatrix(tr_x_pre.rows, 1, 1, trainOnes);
+    Matrix<float> testOnes;
+    Matrix<float>::GetSingleValMatrix(te_x_pre.rows, 1, 1, testOnes);
+
     Matrix<float> tr_x;
-    train.GetSubmatrix(0, train.rows - 1, 0, train.cols - 1, tr_x);
+    Matrix<float>::ConcatCols(trainOnes, tr_x_pre, tr_x);
     Matrix<float> te_x;
-    train.GetSubmatrix(0, test.rows - 1, 0. test.cols - 1, te_x);
+    Matrix<float>::ConcatCols(testOnes, te_x_pre, te_x);
+
+    Matrix<float> tr_y;
+    train.GetSubmatrix(train.rows - 1, 1, 0, train.cols, tr_y);
+    Matrix<float> te_y;
+    train.GetSubmatrix(test.rows - 1, 1, 0, test.cols, te_y);
+
+    //Initialize weights
+    enum ActivationType { SIGMOID, TANH, RELU };
+    ActivationType at;
+    at = SIGMOID;
+    float range_min;
+    float range_max;
+    switch(at)
+    {
+        case SIGMOID:
+        case RELU:
+            range_min = -0.05f;
+            range_max = 0.05f;
+            break;
+        case TANH:
+            range_min = -0.2f;
+            range_max = 0.2f;
+            break;
+        default:
+            throw std::runtime_error("Unknown activation type");
+    }
+
+
+    
+
+
+
+    
+    
 
     
 
