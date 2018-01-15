@@ -209,10 +209,10 @@ int main(int argc, char** argv)
     //For now we will continue with the somewhat weird convention there of transposing the inputs so that the examples
     //are in columns instead of in rows, but I don't really see how that's advantageous so will probably switch
     //to the more intuitive setup once I've verified that it works.
-    Matrix<float> TRAIN;
+    Matrix<float> train;
     std::ifstream ifsTrain(argv[1]);
     TRAIN.ReadAscii(ifsTrain);
-    Matrix<float> TEST;
+    Matrix<float> test;
     std::ifstream ifsTest(argv[2]);
     TEST.ReadAscii(ifsTest);
 
@@ -225,9 +225,9 @@ int main(int argc, char** argv)
     std::vector<Matrix<float>> WEIGHTS;
     bool init_weights = true;
 
-    int trainRowCnt = TRAIN.rows;
-    int testRowCnt = TEST.rows;
-    int colCnt = TRAIN.cols;
+    int trainRowCnt = train.rows;
+    int testRowCnt = test.rows;
+    int colCnt = train.cols;
     int featCnt = colCnt;
 
     float SCALERATIO = -100;
@@ -235,6 +235,12 @@ int main(int argc, char** argv)
 
     //TR_X = GetFeatures(TRAIN);
     //TE_X = GetFeatures(TEST);
+    Matrix<float> tr_x;
+    train.GetSubmatrix(0, train.rows - 1, 0, train.cols - 1, tr_x);
+    Matrix<float> te_x;
+    train.GetSubmatrix(0, test.rows - 1, 0. test.cols - 1, te_x);
+
+    
 
 
 

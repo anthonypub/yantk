@@ -103,10 +103,34 @@ TEST_CASE ("Matrix class", "[Matrix]")
 
             REQUIRE(readToMe.rows == 2);
             REQUIRE(readToMe.cols == 2);
-            REQUIRE(readToMe.get(0, 0) == 1.0);
-            REQUIRE(readToMe.get(0, 1) == 2.0);
-            REQUIRE(readToMe.get(1, 0) == 3.0);
-            REQUIRE(readToMe.get(1, 1) == 4.0);
+            REQUIRE(readToMe.get(0, 0) == 1.0f);
+            REQUIRE(readToMe.get(0, 1) == 2.0f);
+            REQUIRE(readToMe.get(1, 0) == 3.0f);
+            REQUIRE(readToMe.get(1, 1) == 4.0f);
+    }
+
+    SECTION ("ConcatCols")
+    {
+        Matrix<float> concat;
+        Matrix<float>::ConcatCols(lhsMatrix, rhsMatrix, concat);
+        REQUIRE(concat.rows == 2);
+        REQUIRE(concat.cols == 4);
+        REQUIRE(concat.get(0, 0) == 1.0f);
+        REQUIRE(concat.get(0, 2) == 5.0f);
+        REQUIRE(concat.get(1, 0) == 3.0f);
+        REQUIRE(concat.get(1, 3) == 8.0f);
+    }
+
+    SECTION ("SingleVal")
+    {
+        Matrix<float> single;
+        Matrix<float>::GetSingleValMatrix(2, 2, 1.0f, single);
+        REQUIRE(single.rows == 2);
+        REQUIRE(single.cols == 2);
+        REQUIRE(single.get(0, 0) == 1.0f);
+        REQUIRE(single.get(0, 1) == 1.0f);
+        REQUIRE(single.get(1, 0) == 1.0f);
+        REQUIRE(single.get(1, 1) == 1.0f);
     }
 
 }

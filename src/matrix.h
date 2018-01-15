@@ -115,6 +115,7 @@ public:
         ApplyEltwiseFn([](T t) {return t * ((T)1 - t);  });
     }
 
+
     static Matrix<T> ApplyMemberwiseFn(const Matrix<T>& lhs, const Matrix<T>& rhs, std::function<T(const T lhs, const T rhs)> fn)
     {
         assert(lhs.rows == rhs.rows && lhs.cols == rhs.cols);
@@ -173,6 +174,42 @@ public:
             {
                out.set(i - rowBegin, j - colBegin, get(i, j)); 
             }
+        }
+    }
+
+    //Return a new matrix which is the concatenation of the left and right sides
+    static void ConcatCols(const Matrix<T>& lhs, const Matrix<T>& rhs, 
+                    Matrix<T>& out)
+    {
+        assert(lhs.rows == rhs.rows);
+        out.rows = lhs.rows;
+        out.cols = lhs.cols + rhs.cols;
+        out.data.resize(out.rows * out.cols);
+        //TODO: Make this more efficient using memcpy
+        for(int i = 0; i < out.rows; ++i)
+        {
+                //lhs
+                for(int j=0; j < lhs.cols; ++j)
+                {
+                        out.set(i, j, lhs.get(i, j));
+                }
+                //rhs
+                for(int j=0; j < rhs.cols; ++j)
+                {
+                        out.set(i, j + lhs.cols, rhs.get(i, j));
+                }
+        }
+    }
+
+    static void GetSingleValMatrix(int rows, int cols, T singleVal, Matrix<T>& out)
+    {
+        out.rows = rows;
+        out.cols = cols;
+        out.data.resize(rows * cols);
+
+        for(int i=0; i < out.data.size(); ++i)
+        {
+                out.data[i] = singleVal;
         }
     }
 
