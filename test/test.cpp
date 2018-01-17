@@ -144,6 +144,19 @@ TEST_CASE ("Matrix class", "[Matrix]")
         }
     }
 
+    SECTION ("Min")
+    {
+        REQUIRE(lhsMatrix.Min() == 1.0f);
+        REQUIRE(rhsMatrix.Min() == 5.0f);        
+    }
+
+    SECTION ("Max")
+    {
+        REQUIRE(lhsMatrix.Max() == 4.0f);
+        REQUIRE(rhsMatrix.Max() == 8.0f);        }
+
+
+
 
 
 }

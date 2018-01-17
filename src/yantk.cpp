@@ -221,6 +221,7 @@ int main(int argc, char** argv)
     Matrix<float> te_y;
     train.GetSubmatrix(test.rows - 1, 1, 0, test.cols, te_y);
 
+    //TODO: Most of the rest of this should go in network and/or opt
     //Initialize weights
     enum ActivationType { SIGMOID, TANH, RELU };
     ActivationType at;
@@ -242,18 +243,29 @@ int main(int argc, char** argv)
             throw std::runtime_error("Unknown activation type");
     }
 
-
+    int numlayers = 3;
+    int numHiddenLayers=1;
+    int hiddenWidth = 128;
+    int numOut = tr_y.Max() + 1;
     
+    std::vector<Matrix<float>> weights;
 
-
-
+    Matrix<float> in2hid1Weights(hiddenWidth, train.cols);
+    Matrix<float>::RandInitMatrix(range_min, range_max, in2hid1Weights); 
+    weights.push_back(in2hid1Weights);
     
-    
+    //Hidden layers
+    for(int i=1; i < numHiddenLayers; ++i)
+    {
+        Matrix<float> hid2hid(hiddenWidth, hiddenWidth);
+        Matrix<float>::RandInitMatrix(range_min, range_max, hid2hid); 
+        weights.push_back(hid2hid);
+    }
 
-    
-
-
-
+    //Last hidden -> output
+    Matrix<float> hid2out(numOut, hiddenWidth);
+    Matrix<float>::RandInitMatrix(range_min, range_max, hid2out); 
+    weights.push_back(hid2out);
 
 }
 

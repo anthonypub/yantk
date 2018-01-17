@@ -3,6 +3,7 @@
 #include <functional>
 #include <cblas.h>
 #include <cassert>
+#include <limits>
 
 template<typename T> void MatMul(const T* A, const T* B, T* C, int m, int n, int k)
 {
@@ -20,7 +21,6 @@ public:
     int rows;
     int cols;
     std::vector<T> data;
-    bool ownMemory;
     std::string name;
 
     void ReadAscii(std::istream& ifs)
@@ -73,7 +73,7 @@ public:
             }
     }
 
-    Matrix() { rows = 0; cols = 0; ownMemory = false; name = "anonymous"; }
+    Matrix() { rows = 0; cols = 0; name = "anonymous"; }
 
     Matrix(int r, int c, T* d)
     {
@@ -133,6 +133,28 @@ public:
     {
         ApplyEltwiseFn([](T t) {return t * ((T)1 - t);  });
     }
+
+    T Min()
+    {
+        T min = std::numeric_limits<T>::max();
+        for(T t : data)
+        {
+            if(t < min) min = t;
+        }
+        return min;
+    }   
+
+    T Max()
+    {
+        T max = std::numeric_limits<T>::min();
+        for(T t : data)
+        {
+            if(t > max) max = t;
+        }   
+        return max;
+    }   
+
+       
 
 
     static Matrix<T> ApplyMemberwiseFn(const Matrix<T>& lhs, const Matrix<T>& rhs, std::function<T(const T lhs, const T rhs)> fn)
