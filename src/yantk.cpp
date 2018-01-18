@@ -22,7 +22,7 @@ template<typename T> void RandInitMatrix(Matrix<T>& randomizeMe, T min, T max)
 }
 
 template<typename T> void forward(Matrix<T>& input, const std::vector<Matrix<T>>& weights, /*out*/ 
-    std::vector<Matrix<T>>& weightedSums, std::vector<Matrix<T>>& activations)
+        std::vector<Matrix<T>>& weightedSums, std::vector<Matrix<T>>& activations)
 {
     weightedSums.clear();
     activations.clear();
@@ -88,7 +88,7 @@ void ff_scratch_network()
     //For quadratic error the first term is just (a_k - y), and the second term is 
     //the derivative of the sigmoid function on z_k (nlderiv(z_k)
     std::vector<Matrix<float>> ds(allWeights.size());
-   
+
     int numLayers = weightedSums.size();
     Matrix<float> dcda = Matrix<float>::MemberwiseSubtract(activations[numLayers - 1], Y);
     dcda.name = "dcda";
@@ -120,21 +120,21 @@ void ff_scratch_network()
         ds[currIdx] = dl;
         --currIdx;
     }
-    
+
     /*
-    Matrix<float> images;
-    Matrix<float> labels;
-    ReadMatrix("c:\\users\\anthaue\\onedrive\\documents\\school\\mnist\\images.10.mat",
-        images);
+       Matrix<float> images;
+       Matrix<float> labels;
+       ReadMatrix("c:\\users\\anthaue\\onedrive\\documents\\school\\mnist\\images.10.mat",
+       images);
 
-    ReadMatrix("c:\\users\\anthaue\\onedrive\\documents\\school\\mnist\\labels.10.mat",
-        labels);
+       ReadMatrix("c:\\users\\anthaue\\onedrive\\documents\\school\\mnist\\labels.10.mat",
+       labels);
 
-    std::cout << "Images is " << images.rows << " x " << images.cols << std::endl;
-    images.head(std::cout);
-    std::cout << "Lablels is " << labels.rows << " x " << labels.cols << std::endl;
-    labels.head(std::cout);
-    */
+       std::cout << "Images is " << images.rows << " x " << images.cols << std::endl;
+       images.head(std::cout);
+       std::cout << "Lablels is " << labels.rows << " x " << labels.cols << std::endl;
+       labels.head(std::cout);
+       */
 
 
 }
@@ -142,16 +142,16 @@ void ff_scratch_network()
 
 class Layer
 {
-public:
-    enum {INPUT, FC, SOFTMAX} LayerType;
-    void Forward();
-    void ComputeGradient(float* prevLayerOut);
+    public:
+        enum {INPUT, FC, SOFTMAX} LayerType;
+        void Forward();
+        void ComputeGradient(float* prevLayerOut);
 
-private:
-    Layer* m_pInput;
-    int m_outputSize;
-    float* m_pOutput;
-    float* m_pActivations;
+    private:
+        Layer* m_pInput;
+        int m_outputSize;
+        float* m_pOutput;
+        float* m_pActivations;
 
 };
 
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
     train.GetSubmatrix(0, test.rows - 1, 0, test.cols - 1, te_x_pre);
 
     //Add bias column
-    
+
     Matrix<float> trainOnes;
     Matrix<float>::GetSingleValMatrix(tr_x_pre.rows, 1, 1, trainOnes);
     Matrix<float> testOnes;
@@ -247,13 +247,13 @@ int main(int argc, char** argv)
     int numHiddenLayers=1;
     int hiddenWidth = 128;
     int numOut = tr_y.Max() + 1;
-    
+
     std::vector<Matrix<float>> weights;
 
     Matrix<float> in2hid1Weights(hiddenWidth, train.cols);
     Matrix<float>::RandInitMatrix(range_min, range_max, in2hid1Weights); 
     weights.push_back(in2hid1Weights);
-    
+
     //Hidden layers
     for(int i=1; i < numHiddenLayers; ++i)
     {
@@ -266,6 +266,45 @@ int main(int argc, char** argv)
     Matrix<float> hid2out(numOut, hiddenWidth);
     Matrix<float>::RandInitMatrix(range_min, range_max, hid2out); 
     weights.push_back(hid2out);
+
+    std::vector<Matrix<float>> updates_prev;
+    std::vector<Matrix<float>> updates_squared_sum;
+
+    for(int i=0; i < weights.size(); ++i)
+    {
+        Matrix<float> currPrev;
+        Matrix<float>::GetSingleValMatrix(weights[i].rows, weights[i].cols, 0.0f, currPrev);
+        updates_prev.push_back(currPrev);
+        Matrix<float> currSquaredSum;
+        Matrix<float>::GetSingleValMatrix(weights[i].rows, weights[i].cols, 1.0f, currPrev);
+        updates_squared_sum.push_back(currSquaredSum);
+    }
+
+    Matrix<float> target;
+    Matrix<float>::GetSingleValMatrix(numOut, trainRowCnt, 0.0f, target);
+    for(int i=0; i < trainRowCnt; ++i)
+    {
+        target.set(tr_y.get(i, 1), i, 1);
+    }
+
+    int curr_iter = 0;
+    float best_test_acc = -1.0f;
+
+    learn_rate = learn_rate / minibatch_size;
+
+    int iterations = 2;
+    while(curr_iter < iterations)
+    {
+        int right = 0;
+        int wrong = 0;
+        
+
+    }
+
+
+
+
+
 
 }
 
