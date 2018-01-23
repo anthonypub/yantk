@@ -10,6 +10,8 @@
 #include <exception>
 #include "matrix.h"
 
+using namespace std;
+
 template<typename T> void RandInitMatrix(Matrix<T>& randomizeMe, T min, T max)
 {
     for (int i = 0; i < randomizeMe.data.size(); ++i)
@@ -161,13 +163,14 @@ class Optimizer //e.g. SGD, AdaGrad, ADAM, etc.
 };
 
 
-
 int main(int argc, char** argv)
 {
+    std::cout << "Starting up" << std::endl;
     srand(42);
     if (argc != 3)
     {
         std::cerr << "Usage: yantk TRAIN TEST" << std::endl;
+        return 1;
     }
     //Straightforward port of trainff_gpu.m
     //For now we will continue with the somewhat weird convention there of transposing the inputs so that the examples
@@ -179,6 +182,13 @@ int main(int argc, char** argv)
     Matrix<float> test;
     std::ifstream ifsTest(argv[2]);
     test.ReadAscii(ifsTest);
+
+    std::cout << "Read train and test." << std::endl;
+
+    std::cout << "train" << std::endl;
+    train.head(cout);
+    cout << "test" << endl;
+    test.head(cout);
 
     //TODO: Read in from file(s)
     float learn_rate = 0.1;
@@ -199,6 +209,7 @@ int main(int argc, char** argv)
 
     //TR_X = GetFeatures(TRAIN);
     //TE_X = GetFeatures(TEST);
+    cout << "Slicing into x and y..." << std::endl;
     Matrix<float> tr_x_pre;
     train.GetSubmatrix(0, train.rows - 1, 0, train.cols - 1, tr_x_pre);
     Matrix<float> te_x_pre;
@@ -250,6 +261,8 @@ int main(int argc, char** argv)
 
     std::vector<Matrix<float>> weights;
 
+    cout << "Initializing weight matrices..." << std::endl;
+
     Matrix<float> in2hid1Weights(hiddenWidth, train.cols);
     Matrix<float>::RandInitMatrix(range_min, range_max, in2hid1Weights); 
     weights.push_back(in2hid1Weights);
@@ -270,6 +283,8 @@ int main(int argc, char** argv)
     std::vector<Matrix<float>> updates_prev;
     std::vector<Matrix<float>> updates_squared_sum;
 
+    cout << "Initializing matrices for statistics" << endl;
+
     for(int i=0; i < weights.size(); ++i)
     {
         Matrix<float> currPrev;
@@ -279,6 +294,8 @@ int main(int argc, char** argv)
         Matrix<float>::GetSingleValMatrix(weights[i].rows, weights[i].cols, 1.0f, currPrev);
         updates_squared_sum.push_back(currSquaredSum);
     }
+
+    cout << "Expanding y matrices..." << endl;
 
     Matrix<float> target;
     Matrix<float>::GetSingleValMatrix(numOut, trainRowCnt, 0.0f, target);
@@ -297,7 +314,7 @@ int main(int argc, char** argv)
     {
         int right = 0;
         int wrong = 0;
-        
+        ++curr_iter;
 
     }
 
