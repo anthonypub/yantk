@@ -19,7 +19,7 @@ tester.o: $(TESTROOT)/test.cpp $(SRCROOT)/matrix.h
 	$(CC) $(LFLAGS) $(CFLAGS) $(IFLAGS) -g -c -o tester.o $(TESTROOT)/test.cpp
 
 yantk: yantk.o
-	$(CC) $(LFLAGS) -o yantk yantk.o $(OPENBLASROOT)/libopenblas.a -lpthread
+	$(CC) $(LFLAGS) -g -o yantk yantk.o $(OPENBLASROOT)/libopenblas.a -lpthread
 
 yantk.o: $(SRCROOT)/yantk.cpp $(SRCROOT)/matrix.h
 	$(CC) $(LFLAGS) $(CFLAGS) $(IFLAGS) -g -c $(SRCROOT)/yantk.cpp

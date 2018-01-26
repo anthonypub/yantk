@@ -104,7 +104,7 @@ public:
 
     void Multiply(const Matrix<T>& B, Matrix<T>& C) const
     {
-        std::cout << "Multiplying A(" << name << ")[" << rows << ":" << cols << "] * B (" << B.name << ")[" << B.rows << ":" << B.cols << "]";
+        std::cout << "Multiplying A(" << name << ")[" << rows << ":" << cols << "] * B (" << B.name << ")[" << B.rows << ":" << B.cols << "]" << std::endl;
         assert(rows > 0 && B.rows > 0 && cols > 0 && B.cols > 0);
         assert(cols == B.rows);
         if (C.rows != cols || C.cols != B.cols)

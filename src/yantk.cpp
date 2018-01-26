@@ -32,8 +32,10 @@ void squish(Matrix<float>& squishMe, ActivationType type)
     {
         case SIGMOID:
             squishMe.EltwiseSigmoid();
+            break;
         case TANH:
             squishMe.EltwiseTanh();
+            break;
         case RELU:
         default:
             throw std::runtime_error("nyi");
@@ -64,6 +66,7 @@ vector<Matrix<float>> forward(vector<Matrix<float>>& weights, Matrix<float> x, A
         squish(tmp, type);
         ret.push_back(tmp);
     }
+    return ret;
 }
 
 
@@ -208,28 +211,27 @@ int main(int argc, char** argv)
         target.set(tr_y.get(i, 1), i, 1);
     }
 
-    int curr_iter = 0;
     float best_test_acc = -1.0f;
 
     learn_rate = learn_rate / minibatch_size;
 
     int epochs = 2;
-    while(curr_iter < epochs)
+    for(int curr_iter=0; curr_iter < epochs; ++curr_iter)
     {
         int right = 0;
         int wrong = 0;
         ++curr_iter;
         //Read in a minibatch
-        int row = 0;
-        while(row + minibatch_size < trainRowCnt)
+        for(int row=0; row < trainRowCnt; row += minibatch_size)
         {
             Matrix<float> xBatch;
             tr_x.GetSubmatrix(row, minibatch_size, 0, tr_x.cols, xBatch);
             Matrix<float> yBatch;
             target.GetSubmatrix(0,tr_y.rows, row, minibatch_size, yBatch);
+            Matrix<float> transX;
+            xBatch.Transpose(transX);
+            vector<Matrix<float>> fwdResults = forward(weights, transX, at);
         }
-
     }
-
 }
 
