@@ -124,6 +124,11 @@ public:
         }
     }
 
+    void EltwiseTanh()
+    {
+        ApplyEltwiseFn([](T t) {return tanh(t);});
+    }
+
     void EltwiseSigmoid()
     {
         ApplyEltwiseFn([](T t) {return (T)1 / ((T)1 + exp(-t)); });
