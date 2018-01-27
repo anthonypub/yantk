@@ -231,6 +231,7 @@ int main(int argc, char** argv)
             Matrix<float> transX;
             xBatch.Transpose(transX);
             vector<Matrix<float>> fwdResults = forward(weights, transX, at);
+
         }
     }
 }

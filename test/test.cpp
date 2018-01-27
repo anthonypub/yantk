@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "matrix.h"
+#include "MSELoss.h"
 #include <sstream>
 
 TEST_CASE ("Matrix class", "[Matrix]") 
@@ -153,8 +154,38 @@ TEST_CASE ("Matrix class", "[Matrix]")
     SECTION ("Max")
     {
         REQUIRE(lhsMatrix.Max() == 4.0f);
-        REQUIRE(rhsMatrix.Max() == 8.0f);        }
+        REQUIRE(rhsMatrix.Max() == 8.0f);        
+    }
 
+}
+
+
+TEST_CASE ("Losses", "[LossTest]") 
+{
+
+    float testLhs[] = 
+    { 
+            1.0f, 2.0f,
+            3.0f, 4.0f
+    };
+    float testRhs[] = 
+    {
+            5.0f, 6.0f,
+            7.0f, 8.0f
+    };
+ 
+    Matrix<float> lhsMatrix(2, 2, testLhs);
+    Matrix<float> rhsMatrix(2, 2, testRhs);
+
+    SECTION ("LossDeriv")
+    {
+        Matrix<float> retMatrix(2, 2);
+        MeanSquaredErrorLoss::LossDerivative(lhsMatrix, rhsMatrix, retMatrix);
+        REQUIRE(retMatrix.get(0,0) == 4.0f);
+        REQUIRE(retMatrix.get(0,1) == 4.0f);
+        REQUIRE(retMatrix.get(1,0) == 4.0f);
+        REQUIRE(retMatrix.get(1,1) == 4.0f);
+    }
 
 
 
