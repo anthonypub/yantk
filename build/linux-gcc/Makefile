@@ -13,10 +13,10 @@ test: tester
 	./tester
 
 testnet: testnet.o
-	$(CC) $(LFLAGS) -o testnet testnet.o 
+	$(CC) -o testnet testnet.o 
 
 testnet.o: $(SRCROOT)/testnet.cpp
-	$(CC) $(LFLAGS) $(CFLAGS) $(IFLAGS) -g -c -o testnet.o $(SRCROOT)/testnet.cpp
+	$(CC)  $(CFLAGS) $(IFLAGS) -g -c -o testnet.o $(SRCROOT)/testnet.cpp
 
 
 tester: tester.o

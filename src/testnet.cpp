@@ -7,9 +7,9 @@
 #include <cmath>
 #include <vector>
 #include <functional>
+#include <cstdlib>
 
 using namespace std;
-using namespace std::placeholders; //for bind
 
 class TestNet
 {
@@ -42,22 +42,22 @@ class TestNet
         std::function<float(float, float)> cost_fn;
         std::function<float(float, float)> cost_deriv_fn;
 
-        float sigmoid(float f)
+        static float sigmoid(float f)
         {
             return 1.0f / (1.0f + exp(-f));
         }
 
-        float sigderiv(float f)
+        static float sigderiv(float f)
         {
             return f * (1.0 - f);
         }
 
-        float my_tanh(float f)
+        static float my_tanh(float f)
         {
             return tanh(f);
         }
         
-        float tanh_deriv(float f)
+        static float tanh_deriv(float f)
         {
             return 1 - (f * f);
         }
@@ -66,13 +66,13 @@ class TestNet
         {
             if(act == "sigmoid")
             {
-                act_fn = bind(TestNet::sigmoid, this, std::placeholders::_1);
-                act_deriv_fn = bind(TestNet::sigderiv, this, _1);
+                act_fn = TestNet::sigmoid;
+                act_deriv_fn = TestNet::sigderiv;
             }
             else if(act == "tanh")
             {
-                act_fn = bind(TestNet::my_tanh, this, _1);
-                act_deriv_fn = bind(TestNet::tanh_deriv, this, _1);
+                act_fn = TestNet::my_tanh;
+                act_deriv_fn = TestNet::tanh_deriv;
             }
             else
             {
@@ -142,8 +142,8 @@ class TestNet
 
             if(dump)
             {
-                cout << "truth y0: " << y0 << ", pred y0 " << o_0 << ", diff " << abs(y0 - o_0) << endl;
-                cout << "truth y1: " << y1 << ", pred y1 " << o_1 << ", diff " << abs(y1 - o_1) << endl;
+                cout << "truth y0: " << y0 << ", pred y0 " << o_0 << ", error = " << squared_error(y0, o_0) << endl;
+                cout << "truth y1: " << y1 << ", pred y1 " << o_1 << ", diff " << squared_error(y1, o_1) << endl;
             }
 
             //Now do the updates.
@@ -170,7 +170,7 @@ class TestNet
             err += iterate(0.0, 1.0, 1.0, 0.0, dump, rate);
             err += iterate(1.0, 0.0, 1.0, 0.0, dump, rate);
             err += iterate(1.0, 1.0, 0.0, 1.0, dump, rate);
-            return err / 2.0;
+            return err;
         }
 
 };
@@ -179,9 +179,9 @@ int main(int argc, char** argv)
 {
     TestNet tn;
     tn.InitializeWeights();
-    int iters = 1000;
+    int iters = 10000;
     string act = "sigmoid";
-    float rate = 0.05;
+    float rate = 0.1;
     if(argc > 1) 
     {
         iters = atoi(argv[1]);
@@ -198,7 +198,7 @@ int main(int argc, char** argv)
     tn.set_act(act);
     for(int i=0; i < iters; ++i)
     {
-        float err = tn.run_all_examples(i % 10 == 0, rate);
+        float err = tn.run_all_examples(i % 100 == 0, rate);
         cout << "Err for iter " << i << ": " << err << endl;
     }
 }
