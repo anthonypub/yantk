@@ -113,9 +113,33 @@ class TestNet
             w_o_11 = 5.9187e-01;
         }
 
+        void dump_all()
+        {
+            cout << "W1: " << endl;
+            cout << w_h_00 << " " << w_h_01 << endl;
+            cout << w_h_10 << " " << w_h_11 << endl;
+            cout << "W2: " << endl;
+            cout << w_o_00 << " " << w_o_01 << endl;
+            cout << w_o_10 << " " << w_o_11 << endl;
+
+            cout << "net_h_0: " << net_h_0 << endl;
+            cout << "net_h_1: " << net_h_1 << endl;
+            cout << "act_h_0: " << h_0 << endl;
+            cout << "act_h_1: " << h_1 << endl;
+            cout << "net_o_0: " << net_o_0 << endl;
+            cout << "net_o_1: " << net_o_1 << endl;
+            cout << "act_o_0: " << o_0 << endl;
+            cout << "act_o_1: " << o_1 << endl;
+
+        }
+
         //Returns error for an example
         float iterate(float x0, float x1, float y0, float y1, bool dump, float rate)
         {
+
+             
+            dump_all();
+
             //forward
             net_h_0 = x0 * w_h_00;
             net_h_0 += x1 * w_h_01; 
@@ -146,16 +170,44 @@ class TestNet
                 cout << "truth y1: " << y1 << ", pred y1 " << o_1 << ", diff " << squared_error(y1, o_1) << endl;
             }
 
-            //Now do the updates.
-            w_o_00 += rate * d_o_0 * h_0;
-            w_o_01 += rate * d_o_0 * h_1;
-            w_o_10 += rate * d_o_1 * h_0;
-            w_o_11 += rate * d_o_1 * h_1;
+            float cost_grad_o_00 = d_o_0 * h_0;
+            float cost_grad_o_01 = d_o_0 * h_1;
+            float cost_grad_o_10 = d_o_1 * h_0;
+            float cost_grad_o_11 = d_o_1 * h_1;
 
-            w_h_00 += rate * d_h_0 * x0;
-            w_h_01 += rate * d_h_0 * x1;
-            w_h_10 += rate * d_h_1 * x0;
-            w_h_11 += rate * d_h_1 * x1;
+            if(dump)
+            {
+                cout << "cost_grad_o_00: " << cost_grad_o_00 << endl;
+                cout << "cost_grad_o_01: " << cost_grad_o_01 << endl;
+                cout << "cost_grad_o_10: " << cost_grad_o_10 << endl;
+                cout << "cost_grad_o_11: " << cost_grad_o_11 << endl;
+            }
+
+            //Now do the updates.
+            w_o_00 += rate * cost_grad_o_00;
+            w_o_01 += rate * cost_grad_o_01;
+            w_o_10 += rate * cost_grad_o_10;
+            w_o_11 += rate * cost_grad_o_11;
+
+            float cost_grad_h_00 = d_h_0 * x0;
+            float cost_grad_h_01 = d_h_0 * x1;
+            float cost_grad_h_10 = d_h_1 * x0;
+            float cost_grad_h_11 = d_h_1 * x1;
+
+            if(dump)
+            {
+                cout << "cost_grad_h_00: " << cost_grad_h_00 << endl;
+                cout << "cost_grad_h_01: " << cost_grad_h_01 << endl;
+                cout << "cost_grad_h_10: " << cost_grad_h_10 << endl;
+                cout << "cost_grad_h_11: " << cost_grad_h_11 << endl;
+            }
+
+            w_h_00 += rate * cost_grad_h_00;
+            w_h_01 += rate * cost_grad_h_01;
+            w_h_10 += rate * cost_grad_h_10;
+            w_h_11 += rate * cost_grad_h_11;
+
+            dump_all();
 
             //error
             float err = squared_error(y0, o_0) + squared_error(y1, o_1);
@@ -166,10 +218,11 @@ class TestNet
         //returns total error.
         float run_all_examples(bool dump, float rate)
         {
-            float err = iterate(0.0, 0.0, 0.0, 1.0, dump, rate);
+            float err = 0.0f;
+            //err = iterate(0.0, 0.0, 0.0, 1.0, dump, rate);
             err += iterate(0.0, 1.0, 1.0, 0.0, dump, rate);
-            err += iterate(1.0, 0.0, 1.0, 0.0, dump, rate);
-            err += iterate(1.0, 1.0, 0.0, 1.0, dump, rate);
+            //err += iterate(1.0, 0.0, 1.0, 0.0, dump, rate);
+            //err += iterate(1.0, 1.0, 0.0, 1.0, dump, rate);
             return err;
         }
 
