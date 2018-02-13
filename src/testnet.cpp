@@ -36,6 +36,23 @@ class TestNet
         //error for hidden units
         float d_h_0, d_h_1;
         //float rate = 0.1;
+        //derivative of cost funtion w.r.t. outputs
+        float d_c_o_0, d_c_o_1;
+        //derivative of outputs w.r.t. net
+        float d_ao_0, d_ao_1;
+
+        //Weight gradients
+        float cost_grad_o_00;
+        float cost_grad_o_01;
+        float cost_grad_o_10;
+        float cost_grad_o_11;
+
+        float cost_grad_h_00;
+        float cost_grad_h_01;
+        float cost_grad_h_10;
+        float cost_grad_h_11;
+
+
 
         std::function<float(float)> act_fn;
         std::function<float(float)> act_deriv_fn;
@@ -56,7 +73,7 @@ class TestNet
         {
             return tanh(f);
         }
-        
+
         static float tanh_deriv(float f)
         {
             return 1 - (f * f);
@@ -83,26 +100,27 @@ class TestNet
 
         float errderiv(float t, float o)
         {
-            return t-o;
+            //tmp: do we have this backward?
+            return -(t-o);
         }
 
         float squared_error(float t, float o)
         {
-            return (t - o) * (t - o);
+            return ((t - o) * (t - o) / 2.0);
         }
 
         void InitializeWeights()
         {
             /*
-            w_h_00 = 2.4096e-02;
-            w_h_01 = -2.2595e-02;
-            w_h_10 = -1.8613e-02;
-            w_h_11 = 9.4031e-03;
-            w_o_00 = -7.0273e-04;
-            w_o_01 = -1.7906e-02;
-            w_o_10 = -1.4896e-02;
-            w_o_11 = 5.9187e-04;
-            */
+               w_h_00 = 2.4096e-02;
+               w_h_01 = -2.2595e-02;
+               w_h_10 = -1.8613e-02;
+               w_h_11 = 9.4031e-03;
+               w_o_00 = -7.0273e-04;
+               w_o_01 = -1.7906e-02;
+               w_o_10 = -1.4896e-02;
+               w_o_11 = 5.9187e-04;
+               */
             w_h_00 = 2.4096e-01;
             w_h_01 = -2.2595e-01;
             w_h_10 = -1.8613e-01;
@@ -113,7 +131,7 @@ class TestNet
             w_o_11 = 5.9187e-01;
         }
 
-        void dump_all()
+        void dump_weights()
         {
             cout << "W1: " << endl;
             cout << w_h_00 << " " << w_h_01 << endl;
@@ -121,7 +139,14 @@ class TestNet
             cout << "W2: " << endl;
             cout << w_o_00 << " " << w_o_01 << endl;
             cout << w_o_10 << " " << w_o_11 << endl;
+        }
 
+        void dump_all()
+        {
+
+            dump_weights(); 
+
+            cout << "Forward stuff: " << endl;
             cout << "net_h_0: " << net_h_0 << endl;
             cout << "net_h_1: " << net_h_1 << endl;
             cout << "act_h_0: " << h_0 << endl;
@@ -131,14 +156,33 @@ class TestNet
             cout << "act_o_0: " << o_0 << endl;
             cout << "act_o_1: " << o_1 << endl;
 
+            cout << endl << "Error stuff: " << endl;
+
+            cout << "truth y0: " << y0 << ", pred y0 " << o_0 << ", error = " << squared_error(y0, o_0) << endl;
+            cout << "truth y1: " << y1 << ", pred y1 " << o_1 << ", diff " << squared_error(y1, o_1) << endl;
+
+            cout << endl << "Backward stuff: " << endl;
+            cout << "d_c/o_0: " << d_c_o_0 << endl;
+            cout << "d_c/o_1: " << d_c_o_1 << endl;
+            cout << "d_ao_0: " << d_ao_0 << endl;
+            cout << "d_ao_1: " << d_ao_1 << endl;
+
+            cout << "cost_grad_o_00: " << cost_grad_o_00 << endl;
+            cout << "cost_grad_o_01: " << cost_grad_o_01 << endl;
+            cout << "cost_grad_o_10: " << cost_grad_o_10 << endl;
+            cout << "cost_grad_o_11: " << cost_grad_o_11 << endl;
+
+            cout << "cost_grad_h_00: " << cost_grad_h_00 << endl;
+            cout << "cost_grad_h_01: " << cost_grad_h_01 << endl;
+            cout << "cost_grad_h_10: " << cost_grad_h_10 << endl;
+            cout << "cost_grad_h_11: " << cost_grad_h_11 << endl;
+
         }
 
         //Returns error for an example
         float iterate(float x0, float x1, float y0, float y1, bool dump, float rate)
         {
 
-             
-            dump_all();
 
             //forward
             net_h_0 = x0 * w_h_00;
@@ -155,8 +199,15 @@ class TestNet
             o_1 = act_fn(net_o_1);
 
             //backward
-            d_o_0 = errderiv(y0, o_0) * act_deriv_fn(o_0);
-            d_o_1 = errderiv(y1, o_1) * act_deriv_fn(o_1);
+            d_c_o_0 = errderiv(y0, o_0);
+            d_ao_0 = act_deriv_fn(o_0);
+            d_o_0 = d_c_o_0  * d_ao_0;
+            d_c_o_1 = errderiv(y1, o_1);
+            d_ao_1 = act_deriv_fn(o_1);
+            d_o_1 = d_c_o_1 * d_ao_1;
+
+            
+
             float downstream_error_h0 = w_h_00 * d_o_0;
             downstream_error_h0 += w_h_01 * d_o_1;
             d_h_0 = act_deriv_fn(h_0) * downstream_error_h0;
@@ -166,48 +217,41 @@ class TestNet
 
             if(dump)
             {
-                cout << "truth y0: " << y0 << ", pred y0 " << o_0 << ", error = " << squared_error(y0, o_0) << endl;
-                cout << "truth y1: " << y1 << ", pred y1 " << o_1 << ", diff " << squared_error(y1, o_1) << endl;
+           
             }
 
-            float cost_grad_o_00 = d_o_0 * h_0;
-            float cost_grad_o_01 = d_o_0 * h_1;
-            float cost_grad_o_10 = d_o_1 * h_0;
-            float cost_grad_o_11 = d_o_1 * h_1;
+            cost_grad_o_00 = d_o_0 * h_0;
+            cost_grad_o_01 = d_o_0 * h_1;
+            cost_grad_o_10 = d_o_1 * h_0;
+            cost_grad_o_11 = d_o_1 * h_1;
 
-            if(dump)
-            {
-                cout << "cost_grad_o_00: " << cost_grad_o_00 << endl;
-                cout << "cost_grad_o_01: " << cost_grad_o_01 << endl;
-                cout << "cost_grad_o_10: " << cost_grad_o_10 << endl;
-                cout << "cost_grad_o_11: " << cost_grad_o_11 << endl;
-            }
-
+         
             //Now do the updates.
-            w_o_00 += rate * cost_grad_o_00;
-            w_o_01 += rate * cost_grad_o_01;
-            w_o_10 += rate * cost_grad_o_10;
-            w_o_11 += rate * cost_grad_o_11;
+            w_o_00 -= rate * cost_grad_o_00;
+            w_o_01 -= rate * cost_grad_o_01;
+            w_o_10 -= rate * cost_grad_o_10;
+            w_o_11 -= rate * cost_grad_o_11;
 
-            float cost_grad_h_00 = d_h_0 * x0;
-            float cost_grad_h_01 = d_h_0 * x1;
-            float cost_grad_h_10 = d_h_1 * x0;
-            float cost_grad_h_11 = d_h_1 * x1;
+            cost_grad_h_00 = d_h_0 * x0;
+            cost_grad_h_01 = d_h_0 * x1;
+            cost_grad_h_10 = d_h_1 * x0;
+            cost_grad_h_11 = d_h_1 * x1;
 
             if(dump)
             {
-                cout << "cost_grad_h_00: " << cost_grad_h_00 << endl;
-                cout << "cost_grad_h_01: " << cost_grad_h_01 << endl;
-                cout << "cost_grad_h_10: " << cost_grad_h_10 << endl;
-                cout << "cost_grad_h_11: " << cost_grad_h_11 << endl;
+                cout << "Pre-update weights: " << endl;
+                dump_weights();
             }
 
-            w_h_00 += rate * cost_grad_h_00;
-            w_h_01 += rate * cost_grad_h_01;
-            w_h_10 += rate * cost_grad_h_10;
-            w_h_11 += rate * cost_grad_h_11;
+            w_h_00 -= rate * cost_grad_h_00;
+            w_h_01 -= rate * cost_grad_h_01;
+            w_h_10 -= rate * cost_grad_h_10;
+            w_h_11 -= rate * cost_grad_h_11;
 
-            dump_all();
+            if(dump)
+            {
+                dump_all();
+            }
 
             //error
             float err = squared_error(y0, o_0) + squared_error(y1, o_1);
@@ -245,7 +289,7 @@ int main(int argc, char** argv)
     }
     if(argc > 3)
     {
-      rate = atof(argv[3]); 
+        rate = atof(argv[3]); 
     }
 
     tn.set_act(act);
