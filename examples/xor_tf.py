@@ -12,12 +12,14 @@ net_o = tf.matmul(X, W2)
 act_o = tf.sigmoid(net_o)
 
 cost = tf.reduce_sum(((y - act_o) ** 2.0) / 2.0)
-
 grad_o = tf.gradients(act_o, cost)
+grad_o_net = tf.gradients(net_o, cost)
+full_grad = tf.multiply(grad_o * grad_o_net)
 
 with tf.Session() as sess:
     sess.run(W1.initializer)
     sess.run(W2.initializer)
     print(sess.run(cost))
+    print(sess.run(full_grad))
 
 
