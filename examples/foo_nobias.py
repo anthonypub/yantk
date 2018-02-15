@@ -53,24 +53,31 @@ grad_w1_fn = theano.function(inputs=[], outputs=T.grad(cost, W1))
 grad_w2_fn = theano.function(inputs=[], outputs=T.grad(cost, W2))
 
 theano.printing.debugprint(grad_act_o);
+
+manual_grad = theano.function(inputs=[], outputs=-(y - output))
 #theano.printing.pp(grad_act_o);
 #theano.printing.pydotprint(T.grad(cost, output), 'foo.dot');
 
 #theano.printing.debugprint(T.grad(cost, W2))
 #theano.printing.debugprint(grad_w2_fn);
 
+dump = True
 
 start = time.time()
 for i in range(iters):
-    print("W1=", W1.get_value())
-    print("W2=", W2.get_value())
-    print("Output: ", output_fn())
-    print("Target: ", y.get_value());
+    #dump = (iters % 10000 == 0)
+    if dump:
+        print("W1=", W1.get_value())
+        print("W2=", W2.get_value())
+        print("Output: ", output_fn())
+        print("Target: ", y.get_value());
     print('Error at :', i, test())
     train()
-    print("grad_act_o: ", grad_act_o());
+    if dump:
+        print("grad_act_o: ", grad_act_o());
+        print("manual_grad: ", manual_grad());
 #    print("grad_o_net_o: ", grad_o_net_o());
-    print("grad_w1: ", grad_w1_fn());
-    print("grad_w2: ", grad_w2_fn());
+        print("grad_w1: ", grad_w1_fn());
+        print("grad_w2: ", grad_w2_fn());
 end = time.time()
 print('Time (s):', end - start)

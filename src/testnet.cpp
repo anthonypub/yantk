@@ -158,8 +158,9 @@ class TestNet
 
             cout << endl << "Error stuff: " << endl;
 
-            cout << "truth y0: " << y0 << ", pred y0 " << o_0 << ", error = " << squared_error(y0, o_0) << endl;
-            cout << "truth y1: " << y1 << ", pred y1 " << o_1 << ", diff " << squared_error(y1, o_1) << endl;
+            cout << "truth y0: " << y0 << ", pred y0 " << o_0 << ", error = " << y0 - o_0 << ", sq_err=" << squared_error(y0, o_0) << endl;
+            cout << "truth y1: " << y1 << ", pred y1 " << o_1 << ", error = " << y1 - o_1 << ", sq_err=" << squared_error(y1, o_1) << endl;
+
 
             cout << endl << "Backward stuff: " << endl;
             cout << "d_c/o_0: " << d_c_o_0 << endl;
@@ -180,10 +181,12 @@ class TestNet
         }
 
         //Returns error for an example
-        float iterate(float x0, float x1, float y0, float y1, bool dump, float rate)
+        float iterate(float set_x0, float set_x1, float set_y0, float set_y1, bool dump, float rate)
         {
-
-
+            x0 = set_x0;
+            x1 = set_x1;
+            y0 = set_y0;
+            y1 = set_y1;
             //forward
             net_h_0 = x0 * w_h_00;
             net_h_0 += x1 * w_h_01; 
@@ -264,7 +267,7 @@ class TestNet
         {
             float err = 0.0f;
             //err = iterate(0.0, 0.0, 0.0, 1.0, dump, rate);
-            err += iterate(0.0, 1.0, 1.0, 0.0, dump, rate);
+            err = iterate(0.0, 1.0, 1.0, 0.0, dump, rate);
             //err += iterate(1.0, 0.0, 1.0, 0.0, dump, rate);
             //err += iterate(1.0, 1.0, 0.0, 1.0, dump, rate);
             return err;
@@ -295,7 +298,7 @@ int main(int argc, char** argv)
     tn.set_act(act);
     for(int i=0; i < iters; ++i)
     {
-        float err = tn.run_all_examples(i % 100 == 0, rate);
+        float err = tn.run_all_examples(i % 10000 == 0, rate);
         cout << "Err for iter " << i << ": " << err << endl;
     }
 }
