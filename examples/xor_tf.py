@@ -1,4 +1,9 @@
 import tensorflow as tf
+import sys
+
+iters = int(sys.argv[1])
+lr = float(sys.argv[2])
+
 
 X = tf.constant([[0.0, 1.0]], name="X")
 y = tf.constant([[1.0,0.0]], name="y")
@@ -21,18 +26,23 @@ grad_h_net = tf.gradients(xs=net_h, ys=act_h)
 grad_w1 = tf.gradients(xs=W1, ys=cost)
 grad_w2 = tf.gradients(xs=W2, ys=cost)
 
+train_step = tf.train.GradientDescentOptimizer(lr).minimize(cost)
+
 with tf.Session() as sess:
     sess.run(W1.initializer)
     sess.run(W2.initializer)
-    print('h: ', sess.run(act_h))
-    print('o: ', sess.run(act_o))
-    print('err: ', sess.run(err))
-    print('sq_err: ', sess.run(squared_err))
-    print('cost: ', sess.run(cost))
-    print('grad_o: ', sess.run(grad_o))
-    print('grad_o_net: ', sess.run(grad_o_net))
-    print('grad_w2: ', sess.run(grad_w2))
-    print('grad_h: ', sess.run(grad_h))
-    print('grad_h_net: ', sess.run(grad_h_net))
-    print('grad_w1: ', sess.run(grad_w1))
+    for i in range(iters):
+        if i % 1000 == 0:
+            print('h: ', sess.run(act_h))
+            print('o: ', sess.run(act_o))
+            print('err: ', sess.run(err))
+            print('sq_err: ', sess.run(squared_err))
+            print('grad_o: ', sess.run(grad_o))
+            print('grad_o_net: ', sess.run(grad_o_net))
+            print('grad_w2: ', sess.run(grad_w2))
+            print('grad_h: ', sess.run(grad_h))
+            print('grad_h_net: ', sess.run(grad_h_net))
+            print('grad_w1: ', sess.run(grad_w1))
+        sess.run(train_step)
+        print('cost: at ', i, ":", sess.run(cost))
 
