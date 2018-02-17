@@ -4,7 +4,7 @@ OBJROOT=./obj
 OPENBLASROOT=/home/anthonyaue/src/OpenBLAS/
 IFLAGS=-I ../../src -I /home/anthonyaue/src/OpenBLAS/
 CC=g++
-CFLAGS=-std=c++11 
+CFLAGS=-std=c++11 -O2
 LFLAGS=-L $(OPENBLASROOT) -lopenblas
 
 all: yantk

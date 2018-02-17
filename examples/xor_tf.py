@@ -28,8 +28,12 @@ else:
     raise('unknown nonlinearity')
 
 
-X = tf.constant([[0.0, 1.0]], name="X")
-y = tf.constant([[1.0,0.0]], name="y")
+#X = tf.constant([[0.0, 1.0]], name="X")
+X = tf.placeholder(shape=[1, 2], dtype=tf.float32, name="X")
+y = tf.placeholder(shape=[1, 2], dtype=tf.float32, name="y")
+X_feed = [[[0.0, 0.0]], [[0.0, 1.0]], [[1.0, 0.0]], [[1.0, 1.0]] ]
+Y_feed = [[[0.0, 1.0]], [[1.0, 0.0]], [[1.0, 0.0]], [[0.0, 1.0]] ]
+#y = tf.constant([[0.0, 1.0], [1.0, 0.0]], name="y")
 
 W1 = tf.Variable([[2.4096e-01, -1.8613e-01 ], [-2.2595e-01, 9.4031e-01]], name="W1")
 W2 = tf.Variable([[-7.0273e-01, -1.4896e-01], [-1.7906e-01, 5.9187e-01]], name="W2")
@@ -53,21 +57,29 @@ grad_w2 = tf.gradients(xs=W2, ys=cost)
 
 train_step = tf.train.GradientDescentOptimizer(lr).minimize(cost)
 
+print('xo: ', X_feed[0])
+
 with tf.Session() as sess:
     sess.run(W1.initializer)
     sess.run(W2.initializer)
     for i in range(iters):
-        print('cost at ', i, ":", sess.run(cost))
-        if i % 100 == 0:
-            print('h: ', sess.run(act_h))
-            print('o: ', sess.run(act_o))
-            print('err: ', sess.run(err))
-            print('sq_err: ', sess.run(squared_err))
-            print('grad_o: ', sess.run(grad_o))
-            print('grad_o_net: ', sess.run(grad_o_net))
-            print('grad_w2: ', sess.run(grad_w2))
-            print('grad_h: ', sess.run(grad_h))
-            print('grad_h_net: ', sess.run(grad_h_net))
-            print('grad_w1: ', sess.run(grad_w1))
-        sess.run(train_step)
+        total_cost=0.0
+        for j in range(len(X_feed)):
+            dict = {X: X_feed[j], y: Y_feed[j]}
+            curr_cost = sess.run(cost, feed_dict=dict)
+            total_cost += curr_cost
+            if i % 1000 == 0:
+                print('cost at ', i, ":", curr_cost )
+            if i % 1000 == 0:
+                print('h: ', sess.run(act_h, feed_dict=dict))
+                print('o: ', sess.run(act_o, feed_dict=dict))
+                print('err: ', sess.run(err, feed_dict=dict))
+                print('sq_err: ', sess.run(squared_err, feed_dict=dict))
+                print('grad_o: ', sess.run(grad_o, feed_dict=dict))
+                print('grad_o_net: ', sess.run(grad_o_net, feed_dict=dict))
+                print('grad_w2: ', sess.run(grad_w2, feed_dict=dict))
+                print('grad_h: ', sess.run(grad_h, feed_dict=dict))
+                print('grad_w1: ', sess.run(grad_w1, feed_dict=dict))
+            sess.run(train_step, feed_dict=dict)
+        print('total cost at : ',i, ':', total_cost)
 

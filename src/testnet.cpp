@@ -279,10 +279,10 @@ class TestNet
         float run_all_examples(bool dump, float rate)
         {
             float err = 0.0f;
-            //err = iterate(0.0, 0.0, 0.0, 1.0, dump, rate);
-            err = iterate(0.0, 1.0, 1.0, 0.0, dump, rate);
-            //err += iterate(1.0, 0.0, 1.0, 0.0, dump, rate);
-            //err += iterate(1.0, 1.0, 0.0, 1.0, dump, rate);
+            err = iterate(0.0, 0.0, 0.0, 1.0, dump, rate);
+            err += iterate(0.0, 1.0, 1.0, 0.0, dump, rate);
+            err += iterate(1.0, 0.0, 1.0, 0.0, dump, rate);
+            err += iterate(1.0, 1.0, 0.0, 1.0, dump, rate);
             return err;
         }
 
@@ -311,7 +311,11 @@ int main(int argc, char** argv)
     tn.set_act(act);
     for(int i=0; i < iters; ++i)
     {
-        float err = tn.run_all_examples(i % 10000 == 0, rate);
-        cout << "Err for iter " << i << ": " << err << endl;
+        //float err = tn.run_all_examples(i % 1000 == 0, rate);
+        float err = tn.run_all_examples(false, rate);
+        if(i % 100000 == 0)
+        {
+            cout << "Err for iter " << i << ": " << err << endl;
+        }
     }
 }
