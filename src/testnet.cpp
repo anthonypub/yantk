@@ -81,6 +81,18 @@ class TestNet
             return 1 - (f * f);
         }
 
+        static float relu(float f)
+        {
+            return f > 0.0 ? f : 0.0;
+        }
+
+        static float relu_deriv(float f)
+        {
+            return f > 0.0 ? 1.0 : 0.0;
+        }
+
+
+
         void set_act(const std::string& act)
         {
             if(act == "sigmoid")
@@ -93,6 +105,12 @@ class TestNet
                 act_fn = TestNet::my_tanh;
                 act_deriv_fn = TestNet::tanh_deriv;
             }
+            else if(act == "relu")
+            {
+                act_fn = TestNet::relu;
+                act_deriv_fn = TestNet::relu_deriv;
+            }
+
             else
             {
                 throw std::runtime_error("bad activation fn");
@@ -102,7 +120,6 @@ class TestNet
 
         float errderiv(float t, float o)
         {
-            //tmp: do we have this backward?
             return -(t-o);
         }
 
@@ -113,16 +130,6 @@ class TestNet
 
         void InitializeWeights()
         {
-            /*
-               w_h_00 = 2.4096e-02;
-               w_h_01 = -2.2595e-02;
-               w_h_10 = -1.8613e-02;
-               w_h_11 = 9.4031e-03;
-               w_o_00 = -7.0273e-04;
-               w_o_01 = -1.7906e-02;
-               w_o_10 = -1.4896e-02;
-               w_o_11 = 5.9187e-04;
-               */
             w_h_00 = 2.4096e-01;
             w_h_01 = -2.2595e-01;
             w_h_10 = -1.8613e-01;

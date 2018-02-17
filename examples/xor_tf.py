@@ -1,8 +1,31 @@
 import tensorflow as tf
 import sys
 
-iters = int(sys.argv[1])
-lr = float(sys.argv[2])
+
+arglen = len(sys.argv)
+
+if arglen > 1:
+    iters = int(sys.argv[1])
+else:
+    iters = 1
+if arglen > 2:
+    nonlin_name = sys.argv[2]
+else:
+    nonlin_name = 'sigmoid'
+if arglen > 3:
+    lr = float(sys.argv[3])
+else:
+    lr = 0.1
+
+if nonlin_name == 'sigmoid':
+    nonlin = tf.sigmoid
+elif nonlin_name == 'tanh':
+    nonlin = tf.tanh
+elif nonlin_name ==  'relu':
+    nonlin = tf.nn.relu
+else:
+    print('usage: xor_tf.py ITERS NONLIN LEARNRATE')
+    raise('unknown nonlinearity')
 
 
 X = tf.constant([[0.0, 1.0]], name="X")
@@ -12,9 +35,11 @@ W1 = tf.Variable([[2.4096e-01, -1.8613e-01 ], [-2.2595e-01, 9.4031e-01]], name="
 W2 = tf.Variable([[-7.0273e-01, -1.4896e-01], [-1.7906e-01, 5.9187e-01]], name="W2")
 
 net_h = tf.matmul(X, W1)
-act_h = tf.sigmoid(net_h)
+#act_h = tf.sigmoid(net_h)
+act_h = nonlin(net_h)
 net_o = tf.matmul(act_h, W2)
-act_o = tf.sigmoid(net_o)
+#act_o = tf.sigmoid(net_o)
+act_o = nonlin(net_o)
 err = y - act_o
 squared_err = err ** 2.0
 
@@ -43,6 +68,6 @@ with tf.Session() as sess:
             print('grad_h: ', sess.run(grad_h))
             print('grad_h_net: ', sess.run(grad_h_net))
             print('grad_w1: ', sess.run(grad_w1))
+            print('cost: at ', i, ":", sess.run(cost))
         sess.run(train_step)
-        print('cost: at ', i, ":", sess.run(cost))
 
