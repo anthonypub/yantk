@@ -57,7 +57,8 @@ with tf.Session() as sess:
     sess.run(W1.initializer)
     sess.run(W2.initializer)
     for i in range(iters):
-        if i % 1000 == 0:
+        print('cost at ', i, ":", sess.run(cost))
+        if i % 100 == 0:
             print('h: ', sess.run(act_h))
             print('o: ', sess.run(act_o))
             print('err: ', sess.run(err))
@@ -68,6 +69,5 @@ with tf.Session() as sess:
             print('grad_h: ', sess.run(grad_h))
             print('grad_h_net: ', sess.run(grad_h_net))
             print('grad_w1: ', sess.run(grad_w1))
-            print('cost: at ', i, ":", sess.run(cost))
         sess.run(train_step)
 
