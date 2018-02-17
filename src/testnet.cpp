@@ -40,6 +40,8 @@ class TestNet
         float d_c_o_0, d_c_o_1;
         //derivative of outputs w.r.t. net
         float d_ao_0, d_ao_1;
+        //derivate of hidden activations
+        float d_ah_0, d_ah_1; 
 
         //Weight gradients
         float cost_grad_o_00;
@@ -168,10 +170,19 @@ class TestNet
             cout << "d_ao_0: " << d_ao_0 << endl;
             cout << "d_ao_1: " << d_ao_1 << endl;
 
+            cout << "d_o_0: " << d_o_0 << endl;
+            cout << "d_o_1: " << d_o_1 << endl;
+
             cout << "cost_grad_o_00: " << cost_grad_o_00 << endl;
             cout << "cost_grad_o_01: " << cost_grad_o_01 << endl;
             cout << "cost_grad_o_10: " << cost_grad_o_10 << endl;
             cout << "cost_grad_o_11: " << cost_grad_o_11 << endl;
+
+            cout << "d_ah_0: " << d_ah_0 << endl;
+            cout << "d_ah_1: " << d_ah_1 << endl;
+
+            cout << "d_h_0: " << d_h_0 << endl;
+            cout << "d_h_1: " << d_h_1 << endl;
 
             cout << "cost_grad_h_00: " << cost_grad_h_00 << endl;
             cout << "cost_grad_h_01: " << cost_grad_h_01 << endl;
@@ -209,19 +220,14 @@ class TestNet
             d_ao_1 = act_deriv_fn(o_1);
             d_o_1 = d_c_o_1 * d_ao_1;
 
-            
-
-            float downstream_error_h0 = w_h_00 * d_o_0;
-            downstream_error_h0 += w_h_01 * d_o_1;
-            d_h_0 = act_deriv_fn(h_0) * downstream_error_h0;
-            float downstream_error_h1 = w_h_10 * d_o_0;
-            downstream_error_h1 += w_h_11 * d_o_1;
-            d_h_1 = act_deriv_fn(h_1) * downstream_error_h1;
-
-            if(dump)
-            {
-           
-            }
+            d_ah_0 = act_deriv_fn(h_0);
+            float downstream_error_h0 = w_o_00 * d_o_0;
+            downstream_error_h0 += w_o_10 * d_o_1;
+            d_h_0 = d_ah_0 * downstream_error_h0;
+            d_ah_1 = act_deriv_fn(h_1);
+            float downstream_error_h1 = w_o_01 * d_o_0;
+            downstream_error_h1 += w_o_11 * d_o_1;
+            d_h_1 = d_ah_1 * downstream_error_h1;
 
             cost_grad_o_00 = d_o_0 * h_0;
             cost_grad_o_01 = d_o_0 * h_1;

@@ -15,7 +15,11 @@ squared_err = err ** 2.0
 
 cost = tf.reduce_sum(squared_err / 2.0)
 grad_o = tf.gradients(xs=act_o, ys=cost)
-grad_o_net = tf.gradients(net_o, cost)
+grad_o_net = tf.gradients(xs=net_o, ys=act_o)
+grad_h = tf.gradients(xs=act_h, ys=cost)
+grad_h_net = tf.gradients(xs=net_h, ys=act_h)
+grad_w1 = tf.gradients(xs=W1, ys=cost)
+grad_w2 = tf.gradients(xs=W2, ys=cost)
 
 with tf.Session() as sess:
     sess.run(W1.initializer)
@@ -24,8 +28,11 @@ with tf.Session() as sess:
     print('o: ', sess.run(act_o))
     print('err: ', sess.run(err))
     print('sq_err: ', sess.run(squared_err))
-    print(sess.run(cost))
-    print(sess.run(grad_o))
-    
-
+    print('cost: ', sess.run(cost))
+    print('grad_o: ', sess.run(grad_o))
+    print('grad_o_net: ', sess.run(grad_o_net))
+    print('grad_w2: ', sess.run(grad_w2))
+    print('grad_h: ', sess.run(grad_h))
+    print('grad_h_net: ', sess.run(grad_h_net))
+    print('grad_w1: ', sess.run(grad_w1))
 
