@@ -13,7 +13,6 @@ using namespace std;
 
 class TestNet
 {
-
     //nomenclature:
     //x* = inputs
     //w_h_ji = input -> hidden weights from input i to hidden j 
@@ -31,6 +30,8 @@ class TestNet
         float w_h_00, w_h_01, w_h_10, w_h_11, net_h_0, net_h_1, h_0, h_1;
         //weights from hidden -> out
         float w_o_00, w_o_01, w_o_10, w_o_11, net_o_0, net_o_1, o_0, o_1;
+        //bias to out
+        float b_0, b_1;
         //error for output units
         float d_o_0, d_o_1;
         //error for hidden units
@@ -43,18 +44,22 @@ class TestNet
         //derivate of hidden activations
         float d_ah_0, d_ah_1; 
 
+        //derivative of cost w.r.t biases
+        float d_b_0, d_b_1;
+
         //Weight gradients
         float cost_grad_o_00;
         float cost_grad_o_01;
         float cost_grad_o_10;
         float cost_grad_o_11;
 
+        float cost_grad_b_0;
+        float cost_grad_b_1;
+
         float cost_grad_h_00;
         float cost_grad_h_01;
         float cost_grad_h_10;
         float cost_grad_h_11;
-
-
 
         std::function<float(float)> act_fn;
         std::function<float(float)> act_deriv_fn;
@@ -90,8 +95,6 @@ class TestNet
         {
             return f > 0.0 ? 1.0 : 0.0;
         }
-
-
 
         void set_act(const std::string& act)
         {
@@ -138,6 +141,8 @@ class TestNet
             w_o_01 = -1.7906e-01;
             w_o_10 = -1.4896e-01;
             w_o_11 = 5.9187e-01;
+            b_0 = 0.0;
+            b_1 = 0.0;
         }
 
         void dump_weights()
@@ -148,6 +153,8 @@ class TestNet
             cout << "W2: " << endl;
             cout << w_o_00 << " " << w_o_01 << endl;
             cout << w_o_10 << " " << w_o_11 << endl;
+            cout << "Biases: " << endl; 
+            cout << b_0 << " " << b_1 << endl; 
         }
 
         void dump_all()
@@ -179,6 +186,9 @@ class TestNet
 
             cout << "d_o_0: " << d_o_0 << endl;
             cout << "d_o_1: " << d_o_1 << endl;
+
+            cout << "d_b_0: " << d_b_0 << endl;
+            cout << "d_b_1: " << d_b_1 << endl;
 
             cout << "cost_grad_o_00: " << cost_grad_o_00 << endl;
             cout << "cost_grad_o_01: " << cost_grad_o_01 << endl;
@@ -214,8 +224,10 @@ class TestNet
             h_1 = act_fn(net_h_1);
             net_o_0 = h_0 * w_o_00;
             net_o_0 += h_1 * w_o_01;
+            net_o_0 += b_0;
             net_o_1 = h_0 * w_o_10;
             net_o_1 += h_1 * w_o_11;
+            net_o_1 += b_1;
             o_0 = act_fn(net_o_0);
             o_1 = act_fn(net_o_1);
 
@@ -223,9 +235,11 @@ class TestNet
             d_c_o_0 = errderiv(y0, o_0);
             d_ao_0 = act_deriv_fn(o_0);
             d_o_0 = d_c_o_0  * d_ao_0;
+            d_b_0 = d_o_0;
             d_c_o_1 = errderiv(y1, o_1);
             d_ao_1 = act_deriv_fn(o_1);
             d_o_1 = d_c_o_1 * d_ao_1;
+            d_b_1 = d_o_1;
 
             d_ah_0 = act_deriv_fn(h_0);
             float downstream_error_h0 = w_o_00 * d_o_0;
@@ -242,12 +256,7 @@ class TestNet
             cost_grad_o_11 = d_o_1 * h_1;
 
          
-            //Now do the updates.
-            w_o_00 -= rate * cost_grad_o_00;
-            w_o_01 -= rate * cost_grad_o_01;
-            w_o_10 -= rate * cost_grad_o_10;
-            w_o_11 -= rate * cost_grad_o_11;
-
+            
             cost_grad_h_00 = d_h_0 * x0;
             cost_grad_h_01 = d_h_0 * x1;
             cost_grad_h_10 = d_h_1 * x0;
@@ -258,6 +267,16 @@ class TestNet
                 cout << "Pre-update weights: " << endl;
                 dump_weights();
             }
+
+            //Now do the updates.
+            w_o_00 -= rate * cost_grad_o_00;
+            w_o_01 -= rate * cost_grad_o_01;
+            w_o_10 -= rate * cost_grad_o_10;
+            w_o_11 -= rate * cost_grad_o_11;
+
+            b_0 -= rate * d_b_0;
+            b_1 -= rate * d_b_1;
+
 
             w_h_00 -= rate * cost_grad_h_00;
             w_h_01 -= rate * cost_grad_h_01;
@@ -311,9 +330,9 @@ int main(int argc, char** argv)
     tn.set_act(act);
     for(int i=0; i < iters; ++i)
     {
-        //float err = tn.run_all_examples(i % 1000 == 0, rate);
-        float err = tn.run_all_examples(false, rate);
-        if(i % 100000 == 0)
+        float err = tn.run_all_examples(i % 1000 == 0 || i == iters - 1, rate);
+        //float err = tn.run_all_examples(false, rate);
+        if(i % 100000 == 0 || i == iters - 1)
         {
             cout << "Err for iter " << i << ": " << err << endl;
         }
