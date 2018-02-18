@@ -28,6 +28,7 @@ else:
     raise('unknown nonlinearity')
 
 
+
 #X = tf.constant([[0.0, 1.0]], name="X")
 X = tf.placeholder(shape=[1, 2], dtype=tf.float32, name="X")
 y = tf.placeholder(shape=[1, 2], dtype=tf.float32, name="y")

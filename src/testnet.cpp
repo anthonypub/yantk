@@ -208,6 +208,23 @@ class TestNet
 
         }
 
+        void DoUpdates(float rate)
+        {
+            //Now do the updates.
+            w_o_00 -= rate * cost_grad_o_00;
+            w_o_01 -= rate * cost_grad_o_01;
+            w_o_10 -= rate * cost_grad_o_10;
+            w_o_11 -= rate * cost_grad_o_11;
+
+            b_0 -= rate * d_b_0;
+            b_1 -= rate * d_b_1;
+
+            w_h_00 -= rate * cost_grad_h_00;
+            w_h_01 -= rate * cost_grad_h_01;
+            w_h_10 -= rate * cost_grad_h_10;
+            w_h_11 -= rate * cost_grad_h_11;
+        }
+
         //Returns error for an example
         float iterate(float set_x0, float set_x1, float set_y0, float set_y1, bool dump, float rate)
         {
@@ -268,21 +285,9 @@ class TestNet
                 dump_weights();
             }
 
-            //Now do the updates.
-            w_o_00 -= rate * cost_grad_o_00;
-            w_o_01 -= rate * cost_grad_o_01;
-            w_o_10 -= rate * cost_grad_o_10;
-            w_o_11 -= rate * cost_grad_o_11;
+            DoUpdates(rate);
 
-            b_0 -= rate * d_b_0;
-            b_1 -= rate * d_b_1;
-
-
-            w_h_00 -= rate * cost_grad_h_00;
-            w_h_01 -= rate * cost_grad_h_01;
-            w_h_10 -= rate * cost_grad_h_10;
-            w_h_11 -= rate * cost_grad_h_11;
-
+            
             if(dump)
             {
                 dump_all();
