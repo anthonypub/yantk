@@ -226,7 +226,7 @@ class TestNet
         }
 
         //Returns error for an example
-        float iterate(float set_x0, float set_x1, float set_y0, float set_y1, bool dump, float rate)
+        float iterate(float set_x0, float set_x1, float set_y0, float set_y1, bool dump, float rate, bool update)
         {
             x0 = set_x0;
             x1 = set_x1;
@@ -272,8 +272,8 @@ class TestNet
             cost_grad_o_10 = d_o_1 * h_0;
             cost_grad_o_11 = d_o_1 * h_1;
 
-         
-            
+
+
             cost_grad_h_00 = d_h_0 * x0;
             cost_grad_h_01 = d_h_0 * x1;
             cost_grad_h_10 = d_h_1 * x0;
@@ -285,9 +285,12 @@ class TestNet
                 dump_weights();
             }
 
-            DoUpdates(rate);
+            if(update)
+            {
+                DoUpdates(rate);
+            }
 
-            
+
             if(dump)
             {
                 dump_all();
@@ -300,13 +303,44 @@ class TestNet
 
         //Does a forward + backward iteration for all the training examples,
         //returns total error.
-        float run_all_examples(bool dump, float rate)
+        float run_all_examples(bool dump, float rate, bool batch)
         {
+
+            vector<vector<float>> all_xs = {
+                {0.0, 0.0}, 
+                {0.0, 1.0},
+                {1.0, 0.0}, 
+                {1.0, 1.0} 
+            };
+            vector<vector<float>> all_ys = {
+                {0.0, 1.0},
+                {1.0, 0.0},
+                {1.0, 0.0},
+                {0.0, 1.0}
+            };
+
             float err = 0.0f;
-            err = iterate(0.0, 0.0, 0.0, 1.0, dump, rate);
-            err += iterate(0.0, 1.0, 1.0, 0.0, dump, rate);
-            err += iterate(1.0, 0.0, 1.0, 0.0, dump, rate);
-            err += iterate(1.0, 1.0, 0.0, 1.0, dump, rate);
+            if(batch)
+            {
+                float grad_o_00_sum = 0.0;
+                float grad_o_01_sum = 0.0;
+                float grad_o_10_sum = 0.0;
+                float grad_o_11_sum = 0.0;
+                float b_0_sum = 0.0;
+                float b_1_sum = 0.0;
+                float w_h_00_sum = 0.0;
+                float w_h_01_sum = 0.0;
+                float w_h_10_sum = 0.0;
+                float w_h_11_sum = 0.0;
+            }
+            else
+            {
+                bool update = true;
+                for(int i=0; i < all_xs.size(); ++i)
+                {
+                    err += iterate(all_xs[i][0], all_xs[i][1], all_ys[i][0], all_ys[i][1], dump, rate, update);
+                }            
+            }
             return err;
         }
 
@@ -319,6 +353,7 @@ int main(int argc, char** argv)
     int iters = 10000;
     string act = "sigmoid";
     float rate = 0.1;
+    bool do_batch = false;
     if(argc > 1) 
     {
         iters = atoi(argv[1]);
@@ -331,11 +366,18 @@ int main(int argc, char** argv)
     {
         rate = atof(argv[3]); 
     }
+    if(argc > 4)
+    {
+        if(string(argv[4]) == "batch")
+        {
+            do_batch = true;
+        }
+    }
 
     tn.set_act(act);
     for(int i=0; i < iters; ++i)
     {
-        float err = tn.run_all_examples(i % 1000 == 0 || i == iters - 1, rate);
+        float err = tn.run_all_examples(i % 1000 == 0 || i == iters - 1, rate, false);
         //float err = tn.run_all_examples(false, rate);
         if(i % 100000 == 0 || i == iters - 1)
         {
