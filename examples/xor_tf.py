@@ -36,10 +36,10 @@ else:
 
 #X = tf.constant([[0.0, 1.0]], name="X")
 if do_batch:
-    #X = tf.constant([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]], name="X")
-    #y = tf.constant([[0.0, 1.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]], name="X")
-    X = tf.constant([[0.0, 0.0], [0.0, 1.0]], name="X")
-    y = tf.constant([[0.0, 1.0], [1.0, 0.0]], name="y")
+    X = tf.constant([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]], name="X")
+    y = tf.constant([[0.0, 1.0], [1.0, 0.0], [1.0, 0.0], [0.0, 1.0]], name="X")
+    #X = tf.constant([[0.0, 0.0], [0.0, 1.0]], name="X")
+    #y = tf.constant([[0.0, 1.0], [1.0, 0.0]], name="y")
 
     X_feed = X
     Y_feed = y
