@@ -309,36 +309,83 @@ class TestNet
             vector<vector<float>> all_xs = {
                 {0.0, 0.0}, 
                 {0.0, 1.0},
+                /*
                 {1.0, 0.0}, 
                 {1.0, 1.0} 
+                */
             };
             vector<vector<float>> all_ys = {
                 {0.0, 1.0},
                 {1.0, 0.0},
+                /*
                 {1.0, 0.0},
                 {0.0, 1.0}
+                */
             };
 
             float err = 0.0f;
             if(batch)
             {
-                float grad_o_00_sum = 0.0;
-                float grad_o_01_sum = 0.0;
-                float grad_o_10_sum = 0.0;
-                float grad_o_11_sum = 0.0;
-                float b_0_sum = 0.0;
-                float b_1_sum = 0.0;
-                float w_h_00_sum = 0.0;
-                float w_h_01_sum = 0.0;
-                float w_h_10_sum = 0.0;
-                float w_h_11_sum = 0.0;
+                float cost_grad_o_00_sum = 0.0;
+                float cost_grad_o_01_sum = 0.0;
+                float cost_grad_o_10_sum = 0.0;
+                float cost_grad_o_11_sum = 0.0;
+                float cost_grad_b_0_sum = 0.0;
+                float cost_grad_b_1_sum = 0.0;
+                float cost_grad_h_00_sum = 0.0;
+                float cost_grad_h_01_sum = 0.0;
+                float cost_grad_h_10_sum = 0.0;
+                float cost_grad_h_11_sum = 0.0;
+                //Accumulate cost_gradients, average for update
+                for(int i=0; i < all_xs.size(); ++i)
+                {
+                    err += iterate(all_xs[i][0], all_xs[i][1], all_ys[i][0], all_ys[i][1], dump, rate, false);
+                    cost_grad_o_00_sum += cost_grad_o_00;
+                    cost_grad_o_01_sum += cost_grad_o_01;
+                    cost_grad_o_10_sum += cost_grad_o_10;
+                    cost_grad_o_11_sum += cost_grad_o_11;
+                    cost_grad_b_0_sum += cost_grad_b_0;
+                    cost_grad_b_1_sum += cost_grad_b_1;
+                    cost_grad_h_00_sum += cost_grad_h_00;
+                    cost_grad_h_01_sum += cost_grad_h_01;
+                    cost_grad_h_10_sum += cost_grad_h_10;
+                    cost_grad_h_11_sum += cost_grad_h_11;
+                }
+
+                cost_grad_o_00 = cost_grad_o_00_sum / (float)all_xs.size();
+                cost_grad_o_01 = cost_grad_o_01_sum / (float)all_xs.size();
+                cost_grad_o_10 = cost_grad_o_10_sum / (float)all_xs.size();
+                cost_grad_o_11 = cost_grad_o_11_sum / (float)all_xs.size();
+                cost_grad_b_0 = cost_grad_b_0_sum / (float)all_xs.size();
+                cost_grad_b_1 = cost_grad_b_1_sum / (float)all_xs.size();
+                cost_grad_h_00 = cost_grad_o_00_sum / (float)all_xs.size();
+                cost_grad_h_01 = cost_grad_o_01_sum / (float)all_xs.size();
+                cost_grad_h_10 = cost_grad_o_10_sum / (float)all_xs.size();
+                cost_grad_h_11 = cost_grad_o_11_sum / (float)all_xs.size();
+                /*
+                cost_grad_o_00 = cost_grad_o_00_sum;
+                cost_grad_o_01 = cost_grad_o_01_sum; 
+                cost_grad_o_10 = cost_grad_o_10_sum;
+                cost_grad_o_11 = cost_grad_o_11_sum;
+                cost_grad_b_0 = cost_grad_b_0_sum;
+                cost_grad_b_1 = cost_grad_b_1_sum;
+                cost_grad_h_00 = cost_grad_o_00_sum;
+                cost_grad_h_01 = cost_grad_o_01_sum;
+                cost_grad_h_10 = cost_grad_o_10_sum;
+                cost_grad_h_11 = cost_grad_o_11_sum;
+                */
+
+                DoUpdates(rate);
+                cout << endl << endl << endl << endl << "Post-update dump: " << endl;
+                cout << endl << endl << endl <<endl;
+                dump_all();
+
             }
             else
             {
-                bool update = true;
                 for(int i=0; i < all_xs.size(); ++i)
                 {
-                    err += iterate(all_xs[i][0], all_xs[i][1], all_ys[i][0], all_ys[i][1], dump, rate, update);
+                    err += iterate(all_xs[i][0], all_xs[i][1], all_ys[i][0], all_ys[i][1], dump, rate, true);
                 }            
             }
             return err;
@@ -370,6 +417,7 @@ int main(int argc, char** argv)
     {
         if(string(argv[4]) == "batch")
         {
+            cout << "Running batch mode" << endl;
             do_batch = true;
         }
     }
@@ -377,7 +425,7 @@ int main(int argc, char** argv)
     tn.set_act(act);
     for(int i=0; i < iters; ++i)
     {
-        float err = tn.run_all_examples(i % 1000 == 0 || i == iters - 1, rate, false);
+        float err = tn.run_all_examples(i % 1000 == 0 || i == iters - 1, rate, do_batch);
         //float err = tn.run_all_examples(false, rate);
         if(i % 100000 == 0 || i == iters - 1)
         {

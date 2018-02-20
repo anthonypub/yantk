@@ -16,6 +16,11 @@ if arglen > 3:
     lr = float(sys.argv[3])
 else:
     lr = 0.1
+if arglen > 4 and sys.argv[4] == 'batch':
+    do_batch = True;
+else:
+    do_batch = False;
+
 
 if nonlin_name == 'sigmoid':
     nonlin = tf.sigmoid
@@ -30,10 +35,20 @@ else:
 
 
 #X = tf.constant([[0.0, 1.0]], name="X")
-X = tf.placeholder(shape=[1, 2], dtype=tf.float32, name="X")
-y = tf.placeholder(shape=[1, 2], dtype=tf.float32, name="y")
-X_feed = [[[0.0, 0.0]], [[0.0, 1.0]], [[1.0, 0.0]], [[1.0, 1.0]] ]
-Y_feed = [[[0.0, 1.0]], [[1.0, 0.0]], [[1.0, 0.0]], [[0.0, 1.0]] ]
+if do_batch:
+    #X = tf.constant([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]], name="X")
+    #y = tf.constant([[0.0, 1.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]], name="X")
+    X = tf.constant([[0.0, 0.0], [0.0, 1.0]], name="X")
+    y = tf.constant([[0.0, 1.0], [1.0, 0.0]], name="y")
+
+    X_feed = X
+    Y_feed = y
+
+else:
+    X = tf.placeholder(shape=[1, 2], dtype=tf.float32, name="X")
+    y = tf.placeholder(shape=[1, 2], dtype=tf.float32, name="y")
+    X_feed = [[[0.0, 0.0]], [[0.0, 1.0]], [[1.0, 0.0]], [[1.0, 1.0]] ]
+    Y_feed = [[[0.0, 1.0]], [[1.0, 0.0]], [[1.0, 0.0]], [[0.0, 1.0]] ]
 #X_feed = [[[0.0, 0.0]] ]
 #Y_feed = [[[0.0, 1.0]] ]
 
@@ -77,8 +92,16 @@ with tf.Session() as sess:
     for i in range(iters):
         report = (i == iters-1) or i % report_freq == 0
         total_cost=0.0
-        for j in range(len(X_feed)):
-            dict = {X: X_feed[j], y: Y_feed[j]}
+        j = 0
+        if do_batch:
+            samples=1
+        else:
+            samples=len(X_feed)
+        while j < samples:
+            if do_batch:
+                dict = None 
+            else:
+                dict = {X: X_feed[j], y: Y_feed[j]}
             if report:
                 print('b: ', sess.run(B))
             curr_cost = sess.run(cost, feed_dict=dict)
@@ -97,6 +120,7 @@ with tf.Session() as sess:
                 print('grad_h: ', sess.run(grad_h, feed_dict=dict))
                 print('grad_w1: ', sess.run(grad_w1, feed_dict=dict))
             sess.run(train_step, feed_dict=dict)
+            j = j + 1 
         if report:
             print('total cost at : ',i, ':', total_cost)
 
