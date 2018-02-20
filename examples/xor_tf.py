@@ -103,7 +103,11 @@ with tf.Session() as sess:
             else:
                 dict = {X: X_feed[j], y: Y_feed[j]}
             if report:
+                print('start pre-run weights')
+                print('w1: ', sess.run(W1))
                 print('b: ', sess.run(B))
+                print('w2: ', sess.run(W2))
+                print('end pre-run weights')
             curr_cost = sess.run(cost, feed_dict=dict)
             total_cost += curr_cost
             if report:

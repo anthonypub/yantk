@@ -361,10 +361,10 @@ class TestNet
                 cost_grad_o_11 = cost_grad_o_11_sum;
                 cost_grad_b_0 = cost_grad_b_0_sum;
                 cost_grad_b_1 = cost_grad_b_1_sum;
-                cost_grad_h_00 = cost_grad_o_00_sum;
-                cost_grad_h_01 = cost_grad_o_01_sum;
-                cost_grad_h_10 = cost_grad_o_10_sum;
-                cost_grad_h_11 = cost_grad_o_11_sum;
+                cost_grad_h_00 = cost_grad_h_00_sum;
+                cost_grad_h_01 = cost_grad_h_01_sum;
+                cost_grad_h_10 = cost_grad_h_10_sum;
+                cost_grad_h_11 = cost_grad_h_11_sum;
 
                 DoUpdates(rate);
                 if(dump)
