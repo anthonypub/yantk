@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+package yantk;
+
+message NetDesc
+{
+    enum NonlinearityType
+    {
+        SIGMOID=0;
+        TANH = 1;
+        RELU = 2;
+    }
+
+    optional int32 num_iterations =1 [default = 1];
+
+    optional NonlinearityType nonlinearity =2 [default = SIGMOID];
+
+    optional float learning_rate =3 [default = 0.1] ;
+
+    optional bool batch = 4 [default = false] ;
+ 
+}
