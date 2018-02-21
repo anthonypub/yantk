@@ -9,6 +9,8 @@
 #include <functional>
 #include <cstdlib>
 
+#include "net.pb.h"
+
 using namespace std;
 
 class TestNet
@@ -216,8 +218,8 @@ class TestNet
             w_o_10 -= rate * cost_grad_o_10;
             w_o_11 -= rate * cost_grad_o_11;
 
-            b_0 -= rate * cost_grad_b_0;
-            b_1 -= rate * cost_grad_b_1;
+            b_0 -= rate * d_b_0;
+            b_1 -= rate * d_b_1;
 
             w_h_00 -= rate * cost_grad_h_00;
             w_h_01 -= rate * cost_grad_h_01;
@@ -272,9 +274,6 @@ class TestNet
             cost_grad_o_10 = d_o_1 * h_0;
             cost_grad_o_11 = d_o_1 * h_1;
 
-            cost_grad_b_0 = d_b_0;
-            cost_grad_b_1 = d_b_1;
-
 
 
             cost_grad_h_00 = d_h_0 * x0;
@@ -312,14 +311,18 @@ class TestNet
             vector<vector<float>> all_xs = {
                 {0.0, 0.0}, 
                 {0.0, 1.0},
+                /*
                 {1.0, 0.0}, 
                 {1.0, 1.0} 
+                */
             };
             vector<vector<float>> all_ys = {
                 {0.0, 1.0},
                 {1.0, 0.0},
+                /*
                 {1.0, 0.0},
                 {0.0, 1.0}
+                */
             };
 
             float err = 0.0f;
@@ -351,24 +354,33 @@ class TestNet
                     cost_grad_h_11_sum += cost_grad_h_11;
                 }
 
+                cost_grad_o_00 = cost_grad_o_00_sum / (float)all_xs.size();
+                cost_grad_o_01 = cost_grad_o_01_sum / (float)all_xs.size();
+                cost_grad_o_10 = cost_grad_o_10_sum / (float)all_xs.size();
+                cost_grad_o_11 = cost_grad_o_11_sum / (float)all_xs.size();
+                cost_grad_b_0 = cost_grad_b_0_sum / (float)all_xs.size();
+                cost_grad_b_1 = cost_grad_b_1_sum / (float)all_xs.size();
+                cost_grad_h_00 = cost_grad_o_00_sum / (float)all_xs.size();
+                cost_grad_h_01 = cost_grad_o_01_sum / (float)all_xs.size();
+                cost_grad_h_10 = cost_grad_o_10_sum / (float)all_xs.size();
+                cost_grad_h_11 = cost_grad_o_11_sum / (float)all_xs.size();
+                /*
                 cost_grad_o_00 = cost_grad_o_00_sum;
                 cost_grad_o_01 = cost_grad_o_01_sum; 
                 cost_grad_o_10 = cost_grad_o_10_sum;
                 cost_grad_o_11 = cost_grad_o_11_sum;
                 cost_grad_b_0 = cost_grad_b_0_sum;
                 cost_grad_b_1 = cost_grad_b_1_sum;
-                cost_grad_h_00 = cost_grad_h_00_sum;
-                cost_grad_h_01 = cost_grad_h_01_sum;
-                cost_grad_h_10 = cost_grad_h_10_sum;
-                cost_grad_h_11 = cost_grad_h_11_sum;
+                cost_grad_h_00 = cost_grad_o_00_sum;
+                cost_grad_h_01 = cost_grad_o_01_sum;
+                cost_grad_h_10 = cost_grad_o_10_sum;
+                cost_grad_h_11 = cost_grad_o_11_sum;
+                */
 
                 DoUpdates(rate);
-                if(dump)
-                {
-                    cout << endl << endl << endl << endl << "Post-update dump: " << endl;
-                    cout << endl << endl << endl <<endl;
-                    dump_all();
-                }
+                cout << endl << endl << endl << endl << "Post-update dump: " << endl;
+                cout << endl << endl << endl <<endl;
+                dump_all();
 
             }
             else
@@ -385,6 +397,11 @@ class TestNet
 
 int main(int argc, char** argv)
 {
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
+    yantk::NetDesc desc;
+    string ser;
+    desc.SerializeToString(&ser);
+
     TestNet tn;
     tn.InitializeWeights();
     int iters = 10000;
@@ -416,7 +433,6 @@ int main(int argc, char** argv)
     for(int i=0; i < iters; ++i)
     {
         float err = tn.run_all_examples(i % 1000 == 0 || i == iters - 1, rate, do_batch);
-        //float err = tn.run_all_examples(false, rate, do_batch);
         //float err = tn.run_all_examples(false, rate);
         if(i % 100000 == 0 || i == iters - 1)
         {

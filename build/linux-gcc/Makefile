@@ -1,19 +1,23 @@
 SRCROOT=../../src
+IFROOT=../../if/cpp
 TESTROOT=../../test
 OBJROOT=./obj
 OPENBLASROOT=/home/anthonyaue/src/OpenBLAS/
-IFLAGS=-I ../../src -I /home/anthonyaue/src/OpenBLAS/
+IFLAGS=-I ../../src -I ../../if/cpp -I /home/anthonyaue/src/OpenBLAS/ -I /usr/local/include
 CC=g++
-CFLAGS=-std=c++11 -O2
-LFLAGS=-L $(OPENBLASROOT) -lopenblas
+CFLAGS=-std=c++11
+LFLAGS=-L $(OPENBLASROOT) -L /usr/local/lib -lopenblas -lprotobuf -lpthread 
 
 all: yantk
 
 test: tester
 	./tester
 
-testnet: testnet.o
-	$(CC) -o testnet testnet.o 
+testnet: testnet.o net.pb.o
+	$(CC)  -o testnet testnet.o net.pb.o $(LFLAGS)
+
+net.pb.o: $(IFROOT)/net.pb.cc
+	$(CC)  $(CFLAGS) $(IFLAGS) -g -c -o net.pb.o $(IFROOT)/net.pb.cc
 
 testnet.o: $(SRCROOT)/testnet.cpp
 	$(CC)  $(CFLAGS) $(IFLAGS) -g -c -o testnet.o $(SRCROOT)/testnet.cpp
