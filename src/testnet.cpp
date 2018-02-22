@@ -9,7 +9,14 @@
 #include <functional>
 #include <cstdlib>
 
+//Platform-specific stuff - abstract this away
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include "net.pb.h"
+#include <google/protobuf/text_format.h>
+#include <google/protobuf/io/zero_copy_stream_impl.h>
 
 using namespace std;
 
@@ -118,6 +125,7 @@ class TestNet
 
             else
             {
+                cout << "Bad: " << act << endl;
                 throw std::runtime_error("bad activation fn");
             }
 
@@ -312,17 +320,17 @@ class TestNet
                 {0.0, 0.0}, 
                 {0.0, 1.0},
                 /*
-                {1.0, 0.0}, 
-                {1.0, 1.0} 
-                */
+                   {1.0, 0.0}, 
+                   {1.0, 1.0} 
+                   */
             };
             vector<vector<float>> all_ys = {
                 {0.0, 1.0},
                 {1.0, 0.0},
                 /*
-                {1.0, 0.0},
-                {0.0, 1.0}
-                */
+                   {1.0, 0.0},
+                   {0.0, 1.0}
+                   */
             };
 
             float err = 0.0f;
@@ -365,17 +373,17 @@ class TestNet
                 cost_grad_h_10 = cost_grad_o_10_sum / (float)all_xs.size();
                 cost_grad_h_11 = cost_grad_o_11_sum / (float)all_xs.size();
                 /*
-                cost_grad_o_00 = cost_grad_o_00_sum;
-                cost_grad_o_01 = cost_grad_o_01_sum; 
-                cost_grad_o_10 = cost_grad_o_10_sum;
-                cost_grad_o_11 = cost_grad_o_11_sum;
-                cost_grad_b_0 = cost_grad_b_0_sum;
-                cost_grad_b_1 = cost_grad_b_1_sum;
-                cost_grad_h_00 = cost_grad_o_00_sum;
-                cost_grad_h_01 = cost_grad_o_01_sum;
-                cost_grad_h_10 = cost_grad_o_10_sum;
-                cost_grad_h_11 = cost_grad_o_11_sum;
-                */
+                   cost_grad_o_00 = cost_grad_o_00_sum;
+                   cost_grad_o_01 = cost_grad_o_01_sum; 
+                   cost_grad_o_10 = cost_grad_o_10_sum;
+                   cost_grad_o_11 = cost_grad_o_11_sum;
+                   cost_grad_b_0 = cost_grad_b_0_sum;
+                   cost_grad_b_1 = cost_grad_b_1_sum;
+                   cost_grad_h_00 = cost_grad_o_00_sum;
+                   cost_grad_h_01 = cost_grad_o_01_sum;
+                   cost_grad_h_10 = cost_grad_o_10_sum;
+                   cost_grad_h_11 = cost_grad_o_11_sum;
+                   */
 
                 DoUpdates(rate);
                 cout << endl << endl << endl << endl << "Post-update dump: " << endl;
@@ -397,37 +405,77 @@ class TestNet
 
 int main(int argc, char** argv)
 {
-    GOOGLE_PROTOBUF_VERIFY_VERSION;
-    yantk::NetDesc desc;
-    string ser;
-    desc.SerializeToString(&ser);
+    int iters = 0;
+    float rate = 0.1;
+    string act = "sigmoid";
+    bool do_batch = false;
+
+    if(argc == 2)
+    {
+        cout << "Single arg, assuming config file" << endl;
+        GOOGLE_PROTOBUF_VERIFY_VERSION;
+        yantk::NetDesc desc;
+        desc.set_num_iterations(10000);
+        desc.set_learning_rate(.1);
+        desc.set_nonlinearity(yantk::NetDesc::SIGMOID);
+        string ser;
+        google::protobuf::TextFormat::PrintToString(desc, &ser);
+        cout << "set from mem:" << endl;
+        cout << ser << endl;
+
+        int fd = open(argv[1], O_RDONLY);
+        google::protobuf::io::FileInputStream net_desc_stream(fd);
+        google::protobuf::TextFormat::Parse(&net_desc_stream, &desc);
+        //close(fd);
+
+        cout << "set from file: " << endl;
+        google::protobuf::TextFormat::PrintToString(desc, &ser);
+        iters = desc.num_iterations();
+
+        cout << ser << endl;
+            switch(desc.nonlinearity())
+        {
+            case yantk::NetDesc::SIGMOID:
+                act="sigmoid";
+                break;
+            case yantk::NetDesc::TANH:
+                act = "tanh";
+                break;
+            case yantk::NetDesc::RELU:
+                act = "relu";
+                break;
+            default:
+                act = "yourmom";
+        }
+        rate = desc.learning_rate();
+    }
+    else
+    {
+        cout << "Multiple args, assuming command line args and no config file" << endl;
+        if(argc > 1) 
+        {
+            iters = atoi(argv[1]);
+        }
+        if(argc > 2)
+        {
+            act = argv[2];
+        }
+        if(argc > 3)
+        {
+            rate = atof(argv[3]); 
+        }
+        if(argc > 4)
+        {
+            if(string(argv[4]) == "batch")
+            {
+                cout << "Running batch mode" << endl;
+                do_batch = true;
+            }
+        }
+    }
 
     TestNet tn;
     tn.InitializeWeights();
-    int iters = 10000;
-    string act = "sigmoid";
-    float rate = 0.1;
-    bool do_batch = false;
-    if(argc > 1) 
-    {
-        iters = atoi(argv[1]);
-    }
-    if(argc > 2)
-    {
-        act = argv[2];
-    }
-    if(argc > 3)
-    {
-        rate = atof(argv[3]); 
-    }
-    if(argc > 4)
-    {
-        if(string(argv[4]) == "batch")
-        {
-            cout << "Running batch mode" << endl;
-            do_batch = true;
-        }
-    }
 
     tn.set_act(act);
     for(int i=0; i < iters; ++i)
