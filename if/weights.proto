@@ -1,0 +1,33 @@
+syntax = "proto2";
+
+package yantk;
+
+message Weights
+{
+    //input -> hidden weights.
+    //w_h_01 == weight for input 1 -> hidden 0
+    required float w_h_00 = 1;
+    required float w_h_01 = 2;
+    required float w_h_10 = 3;
+    required float w_h_11 = 4;
+    //biases into output layer
+    required float b_0 = 5;
+    required float b_1 = 6;
+    //weights from hidden -> output
+    required float w_o_00 = 7;
+    required float w_o_01 = 8;
+    required float w_o_10 = 9;
+    required float w_o_11 = 10;
+}
+
+message IterationWeights
+{
+    required int32 iteration = 1;
+    required Weights weights = 2;
+}
+
+message TrainingWeights
+{
+    repeated IterationWeights iteration_weights = 1; 
+}
+

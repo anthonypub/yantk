@@ -15,6 +15,7 @@
 #include <fcntl.h>
 
 #include "net.pb.h"
+#include "weights.pb.h"
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 
@@ -70,10 +71,35 @@ class TestNet
         float cost_grad_h_10;
         float cost_grad_h_11;
 
+        yantk::TrainingWeights training_weights;
+
         std::function<float(float)> act_fn;
         std::function<float(float)> act_deriv_fn;
         std::function<float(float, float)> cost_fn;
         std::function<float(float, float)> cost_deriv_fn;
+
+        void AddWeightsProto(int iteration)
+        {
+            int fd = open(weightFile.c_str(), O_WRONLY);
+            google::protobuf::io::FileOutputStream ostr(fd);
+            yantk::IterationWeights iw;
+            yantk::Weights w;
+            w.set_w_h_00(this.w_h_00);
+            w.set_w_h_01(this.w_h_01);
+            w.set_w_h_10(this.w_h_10);
+            w.set_w_h_11(this.w_h_11);
+            w.set_b_0(this.b_0);
+            w.set_b_1(this.b_1);
+            w.set_w_o_00(this.w_o_00);
+            w.set_w_o_01(this.w_o_01);
+            w.set_w_o_10(this.w_o_10);
+            w.set_w_o_11(this.w_o_11);
+            iw.set_iteration(iteration);
+            iw.set_weights(w);
+            
+            close(fd);
+
+        }
 
         static float sigmoid(float f)
         {

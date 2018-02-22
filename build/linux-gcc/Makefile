@@ -13,11 +13,14 @@ all: yantk
 test: tester
 	./tester
 
-testnet: testnet.o net.pb.o
-	$(CC)  -o testnet testnet.o net.pb.o $(LFLAGS)
+testnet: testnet.o net.pb.o weights.pb.o
+	$(CC)  -o testnet testnet.o net.pb.o weights.pb.o $(LFLAGS)
 
 net.pb.o: $(IFROOT)/net.pb.cc
 	$(CC)  $(CFLAGS) $(IFLAGS) -g -c -o net.pb.o $(IFROOT)/net.pb.cc
+
+weights.pb.o: $(IFROOT)/weights.pb.cc
+	$(CC) $(CFLAGS) $(IFLAGS) -g -c -o weights.pb.o $(IFROOT)/weights.pb.cc
 
 testnet.o: $(SRCROOT)/testnet.cpp
 	$(CC)  $(CFLAGS) $(IFLAGS) -g -c -o testnet.o $(SRCROOT)/testnet.cpp
