@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "net.pb.h"
 #include "weights.pb.h"
@@ -81,22 +82,30 @@ class TestNet
         void AddWeightsProto(int iteration)
         {
             yantk::IterationWeights* pCurrIterWeights = trainweight_msg.add_iteration_weights();
-            pCurrIterWeights->set_allocated_weights(;
-            w.set_w_h_00(this.w_h_00);
-            w.set_w_h_01(this.w_h_01);
-            w.set_w_h_10(this.w_h_10);
-            w.set_w_h_11(this.w_h_11);
-            w.set_b_0(this.b_0);
-            w.set_b_1(this.b_1);
-            w.set_w_o_00(this.w_o_00);
-            w.set_w_o_01(this.w_o_01);
-            w.set_w_o_10(this.w_o_10);
-            w.set_w_o_11(this.w_o_11);
-            iw.set_iteration(iteration);
-            iw.set_weights(w);
+            pCurrIterWeights->set_iteration(iteration);
+            yantk::Weights* pw = new yantk::Weights();
+            pw->set_w_h_00(w_h_00);
+            pw->set_w_h_01(w_h_01);
+            pw->set_w_h_10(w_h_10);
+            pw->set_w_h_11(w_h_11);
+            pw->set_b_0(b_0);
+            pw->set_b_1(b_1);
+            pw->set_w_o_00(w_o_00);
+            pw->set_w_o_01(w_o_01);
+            pw->set_w_o_10(w_o_10);
+            pw->set_w_o_11(w_o_11);
+
+            
+            pCurrIterWeights->set_allocated_weights(pw);
         }
 
-        void 
+        void DumpWeights(const string& path)
+        {
+            int weight_proto_fd = open(path.c_str(), O_WRONLY | O_CREAT);
+            google::protobuf::io::FileOutputStream weights_stream(weight_proto_fd);
+            google::protobuf::TextFormat::Print(trainweight_msg, &weights_stream);
+            weights_stream.Close();
+        }
 
         static float sigmoid(float f)
         {
@@ -509,5 +518,11 @@ int main(int argc, char** argv)
         {
             cout << "Err for iter " << i << ": " << err << endl;
         }
+        tn.AddWeightsProto(i); 
     }
+
+    tn.DumpWeights("weights.prototxt");
+    
+    
+
 }
