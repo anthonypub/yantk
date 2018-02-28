@@ -1,5 +1,7 @@
 import tensorflow as tf
 import sys
+import net_pb2
+import weights_pb2
 
 
 arglen = len(sys.argv)
