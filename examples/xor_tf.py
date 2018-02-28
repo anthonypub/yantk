@@ -87,6 +87,8 @@ print('xo: ', X_feed[0])
 
 report_freq = 10000
 
+training_weights = weights_pb2.TrainingWeights()
+
 with tf.Session() as sess:
     sess.run(W1.initializer)
     sess.run(W2.initializer)
