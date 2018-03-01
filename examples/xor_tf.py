@@ -2,6 +2,7 @@ import tensorflow as tf
 import sys
 import net_pb2
 import weights_pb2
+from google.protobuf import text_format
 
 
 arglen = len(sys.argv)
@@ -87,13 +88,28 @@ print('xo: ', X_feed[0])
 
 report_freq = 10000
 
-training_weights = weights_pb2.TrainingWeights()
+training_weights_msg = weights_pb2.TrainingWeights()
 
 with tf.Session() as sess:
     sess.run(W1.initializer)
     sess.run(W2.initializer)
     sess.run(B.initializer)
     for i in range(iters):
+        iter_weights_msg = training_weights_msg.iteration_weights.add()
+        iter_weights_msg.iteration = i
+        weights_msg = iter_weights_msg.weights
+        weights_msg.w_h_00 = 0.0
+        weights_msg.w_h_01 = 0.0
+        weights_msg.w_h_10 = 0.0
+        weights_msg.w_h_11 = 0.0
+        weights_msg.b_0 = 0.0
+        weights_msg.b_1 = 0.0
+        weights_msg.w_o_00 = 0.0
+        weights_msg.w_o_01 = 0.0
+        weights_msg.w_o_10 = 0.0
+        weights_msg.w_o_11 = 0.0
+        
+
         report = (i == iters-1) or i % report_freq == 0
         total_cost=0.0
         j = 0
@@ -131,4 +147,9 @@ with tf.Session() as sess:
             j = j + 1 
         if report:
             print('total cost at : ',i, ':', total_cost)
+
+
+    f = open("weights.out", "w")
+    f.write(text_format.MessageToString(training_weights_msg))
+    f.close()
 
