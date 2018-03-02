@@ -7,22 +7,42 @@ from google.protobuf import text_format
 
 arglen = len(sys.argv)
 
-if arglen > 1:
-    iters = int(sys.argv[1])
-else:
-    iters = 1
-if arglen > 2:
-    nonlin_name = sys.argv[2]
-else:
+if arglen == 2:
+    print('single arg, assuming prototxt msg')
+    net_desc_msg = net_pb2.NetDesc()
+    f = open(sys.argv[1], 'r')
+    text_format.Parse(f.read(), net_desc_msg)
+    f.close()
+    iters = net_desc_msg.num_iterations
+    lr = net_desc_msg.learning_rate
+    do_batch = net_desc_msg.batch
     nonlin_name = 'sigmoid'
-if arglen > 3:
-    lr = float(sys.argv[3])
+
 else:
-    lr = 0.1
-if arglen > 4 and sys.argv[4] == 'batch':
-    do_batch = True;
-else:
-    do_batch = False;
+    if arglen > 1:
+        iters = int(sys.argv[1])
+    else:
+        iters = 1
+    if arglen > 2:
+        nonlin_name = sys.argv[2]
+    else:
+        nonlin_name = 'sigmoid'
+    if arglen > 3:
+        lr = float(sys.argv[3])
+    else:
+        lr = 0.1
+    if arglen > 4 and sys.argv[4] == 'batch':
+        do_batch = True;
+    else:
+        do_batch = False;
+
+net_desc_msg = net_pb2.NetDesc()
+net_desc_msg.num_iterations = iters
+net_desc_msg.learning_rate = lr
+net_desc_msg.batch = do_batch
+f = open("desc.out", "w")
+f.write(text_format.MessageToString(net_desc_msg))
+f.close()
 
 
 if nonlin_name == 'sigmoid':
