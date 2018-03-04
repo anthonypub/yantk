@@ -16,7 +16,16 @@ if arglen == 2:
     iters = net_desc_msg.num_iterations
     lr = net_desc_msg.learning_rate
     do_batch = net_desc_msg.batch
-    nonlin_name = 'sigmoid'
+    if net_desc_msg.nonlinearity == net_pb2.NetDesc.SIGMOID:
+        nonlin_name = 'sigmoid'
+    elif net_desc_msg.nonlinearity == net_pb2.NetDesc.TANH:
+        nonlin_name = 'tanh'
+    elif net_desc_msg.nonlinearity == net_pb2.NetDesc.RELU:
+        nonlin_name = 'relu'
+    else:
+        print('bad nonlinearity')
+
+
 
 else:
     if arglen > 1:
@@ -55,6 +64,8 @@ else:
     print('usage: xor_tf.py ITERS NONLIN LEARNRATE')
     raise('unknown nonlinearity')
 
+
+print('Running with iters ', iters, ' nonlin ', nonlin_name, ' lr ', lr, ' batch ', do_batch)
 
 
 #X = tf.constant([[0.0, 1.0]], name="X")
