@@ -512,13 +512,13 @@ int main(int argc, char** argv)
     tn.set_act(act);
     for(int i=0; i < iters; ++i)
     {
+        tn.AddWeightsProto(i); 
         float err = tn.run_all_examples(i % 1000 == 0 || i == iters - 1, rate, do_batch);
         //float err = tn.run_all_examples(false, rate);
         if(i % 100000 == 0 || i == iters - 1)
         {
             cout << "Err for iter " << i << ": " << err << endl;
         }
-        tn.AddWeightsProto(i); 
     }
 
     tn.DumpWeights("weights.prototxt");

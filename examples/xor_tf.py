@@ -117,18 +117,20 @@ with tf.Session() as sess:
     for i in range(iters):
         iter_weights_msg = training_weights_msg.iteration_weights.add()
         iter_weights_msg.iteration = i
+        w1Rep =  sess.run(W1)
+        bRep = sess.run(B)
+        w2Rep = sess.run(W2)
         weights_msg = iter_weights_msg.weights
-        weights_msg.w_h_00 = 0.0
-        weights_msg.w_h_01 = 0.0
-        weights_msg.w_h_10 = 0.0
-        weights_msg.w_h_11 = 0.0
-        weights_msg.b_0 = 0.0
-        weights_msg.b_1 = 0.0
-        weights_msg.w_o_00 = 0.0
-        weights_msg.w_o_01 = 0.0
-        weights_msg.w_o_10 = 0.0
-        weights_msg.w_o_11 = 0.0
-        
+        weights_msg.w_h_00 = w1Rep[0][0] 
+        weights_msg.w_h_01 = w1Rep[1][0]
+        weights_msg.w_h_10 = w1Rep[0][1]
+        weights_msg.w_h_11 = w1Rep[1][1] 
+        weights_msg.b_0 = bRep[0][0]
+        weights_msg.b_1 = bRep[0][1]
+        weights_msg.w_o_00 = w2Rep[0][0] 
+        weights_msg.w_o_01 = w2Rep[1][0] 
+        weights_msg.w_o_10 = w2Rep[0][1] 
+        weights_msg.w_o_11 = w2Rep[1][1]
 
         report = (i == iters-1) or i % report_freq == 0
         total_cost=0.0
