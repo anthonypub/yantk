@@ -7,7 +7,8 @@ OPENBLASROOT=/home/anthonyaue/src/OpenBLAS/
 IFLAGS=-I ../../src -I ../../if/cpp -I /home/anthonyaue/src/OpenBLAS/ -I /usr/local/include
 CC=g++
 CFLAGS=-std=c++11
-LFLAGS=-L $(OPENBLASROOT) -L /usr/local/lib -lopenblas -lprotobuf -lpthread 
+#LFLAGS=-L $(OPENBLASROOT) -L /usr/local/lib -lopenblas -lprotobuf -lpthread 
+LFLAGS=-L $(OPENBLASROOT) -L /usr/local/lib -lprotobuf -lpthread 
 PROTOC=protoc
 
 all: yantk

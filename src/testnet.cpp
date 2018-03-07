@@ -431,6 +431,33 @@ class TestNet
 
 };
 
+yantk::NetDesc::NonlinearityType StringToDescNonlinearity(const std::string& convertMe)
+{
+
+
+    if(convertMe == "sigmoid") return yantk::NetDesc::SIGMOID;
+    if(convertMe == "tanh") return yantk::NetDesc::TANH;
+    if(convertMe == "relu") return yantk::NetDesc::RELU;
+    throw std::runtime_error("Invalid nonlinearity type"); 
+}
+
+
+string DescNonlinearityToString(yantk::NetDesc::NonlinearityType convertMe)
+{
+
+    switch(convertMe)
+    {
+        case yantk::NetDesc::SIGMOID:
+            return "sigmoid";
+        case yantk::NetDesc::TANH:
+            return "tanh";
+        case yantk::NetDesc::RELU:
+            return "relu";
+        default:
+            return "yourmom";
+    }
+}
+
 int main(int argc, char** argv)
 {
     int iters = 0;
@@ -461,20 +488,8 @@ int main(int argc, char** argv)
         iters = desc.num_iterations();
 
         cout << ser << endl;
-            switch(desc.nonlinearity())
-        {
-            case yantk::NetDesc::SIGMOID:
-                act="sigmoid";
-                break;
-            case yantk::NetDesc::TANH:
-                act = "tanh";
-                break;
-            case yantk::NetDesc::RELU:
-                act = "relu";
-                break;
-            default:
-                act = "yourmom";
-        }
+        act = DescNonlinearityToString(desc.nonlinearity());
+            
         rate = desc.learning_rate();
     }
     else
@@ -502,23 +517,35 @@ int main(int argc, char** argv)
         }
     }
 
+
+    yantk::NetDesc dump_desc;
+    dump_desc.set_num_iterations(iters);
+    dump_desc.set_learning_rate(rate);
+    dump_desc.set_batch(do_batch);
+    dump_desc.set_nonlinearity(StringToDescNonlinearity(act));
+    int desc_proto_fd = open("thisrun.netproto", O_RDWR | O_CREAT);
+    google::protobuf::io::FileOutputStream desc_stream(desc_proto_fd);
+    google::protobuf::TextFormat::Print(dump_desc, &desc_stream);
+    desc_stream.Close();
+
     TestNet tn;
     tn.InitializeWeights();
 
     tn.set_act(act);
+    int report_freq = 100000;
     for(int i=0; i < iters; ++i)
     {
-        tn.AddWeightsProto(i); 
-        float err = tn.run_all_examples(i % 1000 == 0 || i == iters - 1, rate, do_batch);
+        if(i % report_freq == 0)
+        {
+            tn.AddWeightsProto(i); 
+        }
+        float err = tn.run_all_examples((i % report_freq) == 0 || i == iters - 1, rate, do_batch);
         //float err = tn.run_all_examples(false, rate);
-        if(i % 100000 == 0 || i == iters - 1)
+        if((i % report_freq) == 0 || i == iters - 1)
         {
             cout << "Err for iter " << i << ": " << err << endl;
         }
     }
 
     tn.DumpWeights("weights.prototxt");
-    
-    
-
 }
