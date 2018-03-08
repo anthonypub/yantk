@@ -1,0 +1,4 @@
+num_iterations: 10
+nonlinearity: SIGMOID
+learning_rate: 0.1
+batch: true

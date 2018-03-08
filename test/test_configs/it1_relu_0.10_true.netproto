@@ -1,0 +1,4 @@
+num_iterations: 1
+nonlinearity: RELU 
+learning_rate: 0.1
+batch: true
