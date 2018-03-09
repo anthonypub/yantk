@@ -24,6 +24,8 @@ if arglen == 2:
         nonlin_name = 'relu'
     else:
         print('bad nonlinearity')
+    weight_output_file = net_desc_msg.output_weights_file
+    report_freq = net_desc_msg.report_frequency
 
 
 
@@ -44,6 +46,9 @@ else:
         do_batch = True;
     else:
         do_batch = False;
+    weight_output_file = "weights.out"
+    report_freq = 10000;
+
 
 net_desc_msg = net_pb2.NetDesc()
 net_desc_msg.num_iterations = iters
@@ -117,8 +122,6 @@ train_step = tf.train.GradientDescentOptimizer(lr).minimize(cost)
 
 print('xo: ', X_feed[0])
 
-report_freq = 10000
-
 training_weights_msg = weights_pb2.TrainingWeights()
 
 with tf.Session() as sess:
@@ -182,7 +185,7 @@ with tf.Session() as sess:
             print('total cost at : ',i, ':', total_cost)
 
 
-    f = open("weights.out", "w")
+    f = open(weight_output_file, "w")
     f.write(text_format.MessageToString(training_weights_msg))
     f.close()
 
