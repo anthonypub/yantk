@@ -4,7 +4,7 @@ IFCPP=$(IFROOT)/cpp
 IFPY=$(IFROOT)/py
 TESTROOT=../../test
 OBJROOT=./obj
-IFLAGS=-I ../../src -I /home/anthonyaue/src/OpenBLAS/ -I $(IFROOT)
+IFLAGS=-I ../../src -I /home/anthonyaue/src/OpenBLAS/ -I $(IFCPP)
 CC=g++
 CFLAGS=-std=c++11 
 LFLAGS=-L $(OPENBLASROOT) -lopenblas -lprotobuf -lpthread 

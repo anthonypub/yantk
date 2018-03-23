@@ -192,6 +192,21 @@ class NetDesc : public ::google::protobuf::Message /* @@protoc_insertion_point(c
 
   // accessors -------------------------------------------------------
 
+  // optional string output_weights_file = 6 [default = "weights.out"];
+  bool has_output_weights_file() const;
+  void clear_output_weights_file();
+  static const int kOutputWeightsFileFieldNumber = 6;
+  const ::std::string& output_weights_file() const;
+  void set_output_weights_file(const ::std::string& value);
+  #if LANG_CXX11
+  void set_output_weights_file(::std::string&& value);
+  #endif
+  void set_output_weights_file(const char* value);
+  void set_output_weights_file(const char* value, size_t size);
+  ::std::string* mutable_output_weights_file();
+  ::std::string* release_output_weights_file();
+  void set_allocated_output_weights_file(::std::string* output_weights_file);
+
   // optional .yantk.NetDesc.NonlinearityType nonlinearity = 2 [default = SIGMOID];
   bool has_nonlinearity() const;
   void clear_nonlinearity();
@@ -205,6 +220,13 @@ class NetDesc : public ::google::protobuf::Message /* @@protoc_insertion_point(c
   static const int kBatchFieldNumber = 4;
   bool batch() const;
   void set_batch(bool value);
+
+  // optional int32 report_frequency = 5 [default = 10000];
+  bool has_report_frequency() const;
+  void clear_report_frequency();
+  static const int kReportFrequencyFieldNumber = 5;
+  ::google::protobuf::int32 report_frequency() const;
+  void set_report_frequency(::google::protobuf::int32 value);
 
   // optional int32 num_iterations = 1 [default = 1];
   bool has_num_iterations() const;
@@ -230,12 +252,19 @@ class NetDesc : public ::google::protobuf::Message /* @@protoc_insertion_point(c
   void clear_has_learning_rate();
   void set_has_batch();
   void clear_has_batch();
+  void set_has_report_frequency();
+  void clear_has_report_frequency();
+  void set_has_output_weights_file();
+  void clear_has_output_weights_file();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
+  static ::google::protobuf::internal::ExplicitlyConstructed< ::std::string> _default_output_weights_file_;
+  ::google::protobuf::internal::ArenaStringPtr output_weights_file_;
   int nonlinearity_;
   bool batch_;
+  ::google::protobuf::int32 report_frequency_;
   ::google::protobuf::int32 num_iterations_;
   float learning_rate_;
   friend struct protobuf_net_2eproto::TableStruct;
@@ -254,13 +283,13 @@ class NetDesc : public ::google::protobuf::Message /* @@protoc_insertion_point(c
 
 // optional int32 num_iterations = 1 [default = 1];
 inline bool NetDesc::has_num_iterations() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
 inline void NetDesc::set_has_num_iterations() {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000010u;
 }
 inline void NetDesc::clear_has_num_iterations() {
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void NetDesc::clear_num_iterations() {
   num_iterations_ = 1;
@@ -278,13 +307,13 @@ inline void NetDesc::set_num_iterations(::google::protobuf::int32 value) {
 
 // optional .yantk.NetDesc.NonlinearityType nonlinearity = 2 [default = SIGMOID];
 inline bool NetDesc::has_nonlinearity() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+  return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void NetDesc::set_has_nonlinearity() {
-  _has_bits_[0] |= 0x00000001u;
+  _has_bits_[0] |= 0x00000002u;
 }
 inline void NetDesc::clear_has_nonlinearity() {
-  _has_bits_[0] &= ~0x00000001u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void NetDesc::clear_nonlinearity() {
   nonlinearity_ = 0;
@@ -303,13 +332,13 @@ inline void NetDesc::set_nonlinearity(::yantk::NetDesc_NonlinearityType value) {
 
 // optional float learning_rate = 3 [default = 0.1];
 inline bool NetDesc::has_learning_rate() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
+  return (_has_bits_[0] & 0x00000020u) != 0;
 }
 inline void NetDesc::set_has_learning_rate() {
-  _has_bits_[0] |= 0x00000008u;
+  _has_bits_[0] |= 0x00000020u;
 }
 inline void NetDesc::clear_has_learning_rate() {
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline void NetDesc::clear_learning_rate() {
   learning_rate_ = 0.1f;
@@ -327,13 +356,13 @@ inline void NetDesc::set_learning_rate(float value) {
 
 // optional bool batch = 4 [default = false];
 inline bool NetDesc::has_batch() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+  return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void NetDesc::set_has_batch() {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00000004u;
 }
 inline void NetDesc::clear_has_batch() {
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void NetDesc::clear_batch() {
   batch_ = false;
@@ -347,6 +376,93 @@ inline void NetDesc::set_batch(bool value) {
   set_has_batch();
   batch_ = value;
   // @@protoc_insertion_point(field_set:yantk.NetDesc.batch)
+}
+
+// optional int32 report_frequency = 5 [default = 10000];
+inline bool NetDesc::has_report_frequency() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void NetDesc::set_has_report_frequency() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void NetDesc::clear_has_report_frequency() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void NetDesc::clear_report_frequency() {
+  report_frequency_ = 10000;
+  clear_has_report_frequency();
+}
+inline ::google::protobuf::int32 NetDesc::report_frequency() const {
+  // @@protoc_insertion_point(field_get:yantk.NetDesc.report_frequency)
+  return report_frequency_;
+}
+inline void NetDesc::set_report_frequency(::google::protobuf::int32 value) {
+  set_has_report_frequency();
+  report_frequency_ = value;
+  // @@protoc_insertion_point(field_set:yantk.NetDesc.report_frequency)
+}
+
+// optional string output_weights_file = 6 [default = "weights.out"];
+inline bool NetDesc::has_output_weights_file() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void NetDesc::set_has_output_weights_file() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void NetDesc::clear_has_output_weights_file() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void NetDesc::clear_output_weights_file() {
+  output_weights_file_.ClearToDefaultNoArena(&NetDesc::_default_output_weights_file_.get());
+  clear_has_output_weights_file();
+}
+inline const ::std::string& NetDesc::output_weights_file() const {
+  // @@protoc_insertion_point(field_get:yantk.NetDesc.output_weights_file)
+  return output_weights_file_.GetNoArena();
+}
+inline void NetDesc::set_output_weights_file(const ::std::string& value) {
+  set_has_output_weights_file();
+  output_weights_file_.SetNoArena(&NetDesc::_default_output_weights_file_.get(), value);
+  // @@protoc_insertion_point(field_set:yantk.NetDesc.output_weights_file)
+}
+#if LANG_CXX11
+inline void NetDesc::set_output_weights_file(::std::string&& value) {
+  set_has_output_weights_file();
+  output_weights_file_.SetNoArena(
+    &NetDesc::_default_output_weights_file_.get(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:yantk.NetDesc.output_weights_file)
+}
+#endif
+inline void NetDesc::set_output_weights_file(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  set_has_output_weights_file();
+  output_weights_file_.SetNoArena(&NetDesc::_default_output_weights_file_.get(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:yantk.NetDesc.output_weights_file)
+}
+inline void NetDesc::set_output_weights_file(const char* value, size_t size) {
+  set_has_output_weights_file();
+  output_weights_file_.SetNoArena(&NetDesc::_default_output_weights_file_.get(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:yantk.NetDesc.output_weights_file)
+}
+inline ::std::string* NetDesc::mutable_output_weights_file() {
+  set_has_output_weights_file();
+  // @@protoc_insertion_point(field_mutable:yantk.NetDesc.output_weights_file)
+  return output_weights_file_.MutableNoArena(&NetDesc::_default_output_weights_file_.get());
+}
+inline ::std::string* NetDesc::release_output_weights_file() {
+  // @@protoc_insertion_point(field_release:yantk.NetDesc.output_weights_file)
+  clear_has_output_weights_file();
+  return output_weights_file_.ReleaseNoArena(&NetDesc::_default_output_weights_file_.get());
+}
+inline void NetDesc::set_allocated_output_weights_file(::std::string* output_weights_file) {
+  if (output_weights_file != NULL) {
+    set_has_output_weights_file();
+  } else {
+    clear_has_output_weights_file();
+  }
+  output_weights_file_.SetAllocatedNoArena(&NetDesc::_default_output_weights_file_.get(), output_weights_file);
+  // @@protoc_insertion_point(field_set_allocated:yantk.NetDesc.output_weights_file)
 }
 
 #ifdef __GNUC__

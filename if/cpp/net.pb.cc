@@ -58,13 +58,17 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_ATTRIBUTE_SECTION
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NetDesc, nonlinearity_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NetDesc, learning_rate_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NetDesc, batch_),
-  2,
-  0,
-  3,
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NetDesc, report_frequency_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NetDesc, output_weights_file_),
+  4,
   1,
+  5,
+  2,
+  3,
+  0,
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 9, sizeof(NetDesc)},
+  { 0, 11, sizeof(NetDesc)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -97,6 +101,10 @@ void TableStruct::InitDefaultsImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::internal::InitProtobufDefaults();
+  NetDesc::_default_output_weights_file_.DefaultConstruct();
+  *NetDesc::_default_output_weights_file_.get_mutable() = ::std::string("weights.out", 11);
+  ::google::protobuf::internal::OnShutdownDestroyString(
+      NetDesc::_default_output_weights_file_.get_mutable());
   _NetDesc_default_instance_._instance.DefaultConstruct();
   ::google::protobuf::internal::OnShutdownDestroyMessage(
       &_NetDesc_default_instance_);}
@@ -109,15 +117,17 @@ namespace {
 void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] GOOGLE_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\tnet.proto\022\005yantk\"\313\001\n\007NetDesc\022\031\n\016num_it"
+      "\n\tnet.proto\022\005yantk\"\226\002\n\007NetDesc\022\031\n\016num_it"
       "erations\030\001 \001(\005:\0011\022>\n\014nonlinearity\030\002 \001(\0162"
       "\037.yantk.NetDesc.NonlinearityType:\007SIGMOI"
       "D\022\032\n\rlearning_rate\030\003 \001(\002:\0030.1\022\024\n\005batch\030\004"
-      " \001(\010:\005false\"3\n\020NonlinearityType\022\013\n\007SIGMO"
-      "ID\020\000\022\010\n\004TANH\020\001\022\010\n\004RELU\020\002"
+      " \001(\010:\005false\022\037\n\020report_frequency\030\005 \001(\005:\0051"
+      "0000\022(\n\023output_weights_file\030\006 \001(\t:\013weigh"
+      "ts.out\"3\n\020NonlinearityType\022\013\n\007SIGMOID\020\000\022"
+      "\010\n\004TANH\020\001\022\010\n\004RELU\020\002"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 224);
+      descriptor, 299);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "net.proto", &protobuf_RegisterTypes);
 }
@@ -162,11 +172,14 @@ const int NetDesc::NonlinearityType_ARRAYSIZE;
 
 // ===================================================================
 
+::google::protobuf::internal::ExplicitlyConstructed< ::std::string> NetDesc::_default_output_weights_file_;
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int NetDesc::kNumIterationsFieldNumber;
 const int NetDesc::kNonlinearityFieldNumber;
 const int NetDesc::kLearningRateFieldNumber;
 const int NetDesc::kBatchFieldNumber;
+const int NetDesc::kReportFrequencyFieldNumber;
+const int NetDesc::kOutputWeightsFileFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 NetDesc::NetDesc()
@@ -183,6 +196,10 @@ NetDesc::NetDesc(const NetDesc& from)
       _has_bits_(from._has_bits_),
       _cached_size_(0) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  output_weights_file_.UnsafeSetDefault(&NetDesc::_default_output_weights_file_.get());
+  if (from.has_output_weights_file()) {
+    output_weights_file_.AssignWithDefault(&NetDesc::_default_output_weights_file_.get(), from.output_weights_file_);
+  }
   ::memcpy(&nonlinearity_, &from.nonlinearity_,
     static_cast<size_t>(reinterpret_cast<char*>(&learning_rate_) -
     reinterpret_cast<char*>(&nonlinearity_)) + sizeof(learning_rate_));
@@ -191,9 +208,11 @@ NetDesc::NetDesc(const NetDesc& from)
 
 void NetDesc::SharedCtor() {
   _cached_size_ = 0;
+  output_weights_file_.UnsafeSetDefault(&NetDesc::_default_output_weights_file_.get());
   ::memset(&nonlinearity_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&batch_) -
       reinterpret_cast<char*>(&nonlinearity_)) + sizeof(batch_));
+  report_frequency_ = 10000;
   num_iterations_ = 1;
   learning_rate_ = 0.1f;
 }
@@ -204,6 +223,7 @@ NetDesc::~NetDesc() {
 }
 
 void NetDesc::SharedDtor() {
+  output_weights_file_.DestroyNoArena(&NetDesc::_default_output_weights_file_.get());
 }
 
 void NetDesc::SetCachedSize(int size) const {
@@ -235,11 +255,16 @@ void NetDesc::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  if (has_output_weights_file()) {
+    GOOGLE_DCHECK(!output_weights_file_.IsDefault(&NetDesc::_default_output_weights_file_.get()));
+    (*output_weights_file_.UnsafeRawStringPointer())->assign(*&NetDesc::_default_output_weights_file_.get());
+  }
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 15u) {
+  if (cached_has_bits & 62u) {
     ::memset(&nonlinearity_, 0, static_cast<size_t>(
         reinterpret_cast<char*>(&batch_) -
         reinterpret_cast<char*>(&nonlinearity_)) + sizeof(batch_));
+    report_frequency_ = 10000;
     num_iterations_ = 1;
     learning_rate_ = 0.1f;
   }
@@ -319,6 +344,36 @@ bool NetDesc::MergePartialFromCodedStream(
         break;
       }
 
+      // optional int32 report_frequency = 5 [default = 10000];
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
+          set_has_report_frequency();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &report_frequency_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // optional string output_weights_file = 6 [default = "weights.out"];
+      case 6: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(50u /* 50 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_output_weights_file()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->output_weights_file().data(), static_cast<int>(this->output_weights_file().length()),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "yantk.NetDesc.output_weights_file");
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -347,24 +402,39 @@ void NetDesc::SerializeWithCachedSizes(
 
   cached_has_bits = _has_bits_[0];
   // optional int32 num_iterations = 1 [default = 1];
-  if (cached_has_bits & 0x00000004u) {
+  if (cached_has_bits & 0x00000010u) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->num_iterations(), output);
   }
 
   // optional .yantk.NetDesc.NonlinearityType nonlinearity = 2 [default = SIGMOID];
-  if (cached_has_bits & 0x00000001u) {
+  if (cached_has_bits & 0x00000002u) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       2, this->nonlinearity(), output);
   }
 
   // optional float learning_rate = 3 [default = 0.1];
-  if (cached_has_bits & 0x00000008u) {
+  if (cached_has_bits & 0x00000020u) {
     ::google::protobuf::internal::WireFormatLite::WriteFloat(3, this->learning_rate(), output);
   }
 
   // optional bool batch = 4 [default = false];
-  if (cached_has_bits & 0x00000002u) {
+  if (cached_has_bits & 0x00000004u) {
     ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->batch(), output);
+  }
+
+  // optional int32 report_frequency = 5 [default = 10000];
+  if (cached_has_bits & 0x00000008u) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->report_frequency(), output);
+  }
+
+  // optional string output_weights_file = 6 [default = "weights.out"];
+  if (cached_has_bits & 0x00000001u) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->output_weights_file().data(), static_cast<int>(this->output_weights_file().length()),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "yantk.NetDesc.output_weights_file");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      6, this->output_weights_file(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -383,24 +453,40 @@ void NetDesc::SerializeWithCachedSizes(
 
   cached_has_bits = _has_bits_[0];
   // optional int32 num_iterations = 1 [default = 1];
-  if (cached_has_bits & 0x00000004u) {
+  if (cached_has_bits & 0x00000010u) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->num_iterations(), target);
   }
 
   // optional .yantk.NetDesc.NonlinearityType nonlinearity = 2 [default = SIGMOID];
-  if (cached_has_bits & 0x00000001u) {
+  if (cached_has_bits & 0x00000002u) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       2, this->nonlinearity(), target);
   }
 
   // optional float learning_rate = 3 [default = 0.1];
-  if (cached_has_bits & 0x00000008u) {
+  if (cached_has_bits & 0x00000020u) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(3, this->learning_rate(), target);
   }
 
   // optional bool batch = 4 [default = false];
-  if (cached_has_bits & 0x00000002u) {
+  if (cached_has_bits & 0x00000004u) {
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->batch(), target);
+  }
+
+  // optional int32 report_frequency = 5 [default = 10000];
+  if (cached_has_bits & 0x00000008u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->report_frequency(), target);
+  }
+
+  // optional string output_weights_file = 6 [default = "weights.out"];
+  if (cached_has_bits & 0x00000001u) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->output_weights_file().data(), static_cast<int>(this->output_weights_file().length()),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "yantk.NetDesc.output_weights_file");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        6, this->output_weights_file(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -420,7 +506,14 @@ size_t NetDesc::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         _internal_metadata_.unknown_fields());
   }
-  if (_has_bits_[0 / 32] & 15u) {
+  if (_has_bits_[0 / 32] & 63u) {
+    // optional string output_weights_file = 6 [default = "weights.out"];
+    if (has_output_weights_file()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->output_weights_file());
+    }
+
     // optional .yantk.NetDesc.NonlinearityType nonlinearity = 2 [default = SIGMOID];
     if (has_nonlinearity()) {
       total_size += 1 +
@@ -430,6 +523,13 @@ size_t NetDesc::ByteSizeLong() const {
     // optional bool batch = 4 [default = false];
     if (has_batch()) {
       total_size += 1 + 1;
+    }
+
+    // optional int32 report_frequency = 5 [default = 10000];
+    if (has_report_frequency()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->report_frequency());
     }
 
     // optional int32 num_iterations = 1 [default = 1];
@@ -475,17 +575,24 @@ void NetDesc::MergeFrom(const NetDesc& from) {
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 15u) {
+  if (cached_has_bits & 63u) {
     if (cached_has_bits & 0x00000001u) {
-      nonlinearity_ = from.nonlinearity_;
+      set_has_output_weights_file();
+      output_weights_file_.AssignWithDefault(&NetDesc::_default_output_weights_file_.get(), from.output_weights_file_);
     }
     if (cached_has_bits & 0x00000002u) {
-      batch_ = from.batch_;
+      nonlinearity_ = from.nonlinearity_;
     }
     if (cached_has_bits & 0x00000004u) {
-      num_iterations_ = from.num_iterations_;
+      batch_ = from.batch_;
     }
     if (cached_has_bits & 0x00000008u) {
+      report_frequency_ = from.report_frequency_;
+    }
+    if (cached_has_bits & 0x00000010u) {
+      num_iterations_ = from.num_iterations_;
+    }
+    if (cached_has_bits & 0x00000020u) {
       learning_rate_ = from.learning_rate_;
     }
     _has_bits_[0] |= cached_has_bits;
@@ -516,8 +623,10 @@ void NetDesc::Swap(NetDesc* other) {
 }
 void NetDesc::InternalSwap(NetDesc* other) {
   using std::swap;
+  output_weights_file_.Swap(&other->output_weights_file_);
   swap(nonlinearity_, other->nonlinearity_);
   swap(batch_, other->batch_);
+  swap(report_frequency_, other->report_frequency_);
   swap(num_iterations_, other->num_iterations_);
   swap(learning_rate_, other->learning_rate_);
   swap(_has_bits_[0], other->_has_bits_[0]);
@@ -535,13 +644,13 @@ void NetDesc::InternalSwap(NetDesc* other) {
 
 // optional int32 num_iterations = 1 [default = 1];
 bool NetDesc::has_num_iterations() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
 void NetDesc::set_has_num_iterations() {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000010u;
 }
 void NetDesc::clear_has_num_iterations() {
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 void NetDesc::clear_num_iterations() {
   num_iterations_ = 1;
@@ -559,13 +668,13 @@ void NetDesc::set_num_iterations(::google::protobuf::int32 value) {
 
 // optional .yantk.NetDesc.NonlinearityType nonlinearity = 2 [default = SIGMOID];
 bool NetDesc::has_nonlinearity() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+  return (_has_bits_[0] & 0x00000002u) != 0;
 }
 void NetDesc::set_has_nonlinearity() {
-  _has_bits_[0] |= 0x00000001u;
+  _has_bits_[0] |= 0x00000002u;
 }
 void NetDesc::clear_has_nonlinearity() {
-  _has_bits_[0] &= ~0x00000001u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 void NetDesc::clear_nonlinearity() {
   nonlinearity_ = 0;
@@ -584,13 +693,13 @@ void NetDesc::set_nonlinearity(::yantk::NetDesc_NonlinearityType value) {
 
 // optional float learning_rate = 3 [default = 0.1];
 bool NetDesc::has_learning_rate() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
+  return (_has_bits_[0] & 0x00000020u) != 0;
 }
 void NetDesc::set_has_learning_rate() {
-  _has_bits_[0] |= 0x00000008u;
+  _has_bits_[0] |= 0x00000020u;
 }
 void NetDesc::clear_has_learning_rate() {
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 void NetDesc::clear_learning_rate() {
   learning_rate_ = 0.1f;
@@ -608,13 +717,13 @@ void NetDesc::set_learning_rate(float value) {
 
 // optional bool batch = 4 [default = false];
 bool NetDesc::has_batch() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+  return (_has_bits_[0] & 0x00000004u) != 0;
 }
 void NetDesc::set_has_batch() {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00000004u;
 }
 void NetDesc::clear_has_batch() {
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 void NetDesc::clear_batch() {
   batch_ = false;
@@ -628,6 +737,93 @@ void NetDesc::set_batch(bool value) {
   set_has_batch();
   batch_ = value;
   // @@protoc_insertion_point(field_set:yantk.NetDesc.batch)
+}
+
+// optional int32 report_frequency = 5 [default = 10000];
+bool NetDesc::has_report_frequency() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+void NetDesc::set_has_report_frequency() {
+  _has_bits_[0] |= 0x00000008u;
+}
+void NetDesc::clear_has_report_frequency() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+void NetDesc::clear_report_frequency() {
+  report_frequency_ = 10000;
+  clear_has_report_frequency();
+}
+::google::protobuf::int32 NetDesc::report_frequency() const {
+  // @@protoc_insertion_point(field_get:yantk.NetDesc.report_frequency)
+  return report_frequency_;
+}
+void NetDesc::set_report_frequency(::google::protobuf::int32 value) {
+  set_has_report_frequency();
+  report_frequency_ = value;
+  // @@protoc_insertion_point(field_set:yantk.NetDesc.report_frequency)
+}
+
+// optional string output_weights_file = 6 [default = "weights.out"];
+bool NetDesc::has_output_weights_file() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void NetDesc::set_has_output_weights_file() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void NetDesc::clear_has_output_weights_file() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void NetDesc::clear_output_weights_file() {
+  output_weights_file_.ClearToDefaultNoArena(&NetDesc::_default_output_weights_file_.get());
+  clear_has_output_weights_file();
+}
+const ::std::string& NetDesc::output_weights_file() const {
+  // @@protoc_insertion_point(field_get:yantk.NetDesc.output_weights_file)
+  return output_weights_file_.GetNoArena();
+}
+void NetDesc::set_output_weights_file(const ::std::string& value) {
+  set_has_output_weights_file();
+  output_weights_file_.SetNoArena(&NetDesc::_default_output_weights_file_.get(), value);
+  // @@protoc_insertion_point(field_set:yantk.NetDesc.output_weights_file)
+}
+#if LANG_CXX11
+void NetDesc::set_output_weights_file(::std::string&& value) {
+  set_has_output_weights_file();
+  output_weights_file_.SetNoArena(
+    &NetDesc::_default_output_weights_file_.get(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:yantk.NetDesc.output_weights_file)
+}
+#endif
+void NetDesc::set_output_weights_file(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  set_has_output_weights_file();
+  output_weights_file_.SetNoArena(&NetDesc::_default_output_weights_file_.get(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:yantk.NetDesc.output_weights_file)
+}
+void NetDesc::set_output_weights_file(const char* value, size_t size) {
+  set_has_output_weights_file();
+  output_weights_file_.SetNoArena(&NetDesc::_default_output_weights_file_.get(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:yantk.NetDesc.output_weights_file)
+}
+::std::string* NetDesc::mutable_output_weights_file() {
+  set_has_output_weights_file();
+  // @@protoc_insertion_point(field_mutable:yantk.NetDesc.output_weights_file)
+  return output_weights_file_.MutableNoArena(&NetDesc::_default_output_weights_file_.get());
+}
+::std::string* NetDesc::release_output_weights_file() {
+  // @@protoc_insertion_point(field_release:yantk.NetDesc.output_weights_file)
+  clear_has_output_weights_file();
+  return output_weights_file_.ReleaseNoArena(&NetDesc::_default_output_weights_file_.get());
+}
+void NetDesc::set_allocated_output_weights_file(::std::string* output_weights_file) {
+  if (output_weights_file != NULL) {
+    set_has_output_weights_file();
+  } else {
+    clear_has_output_weights_file();
+  }
+  output_weights_file_.SetAllocatedNoArena(&NetDesc::_default_output_weights_file_.get(), output_weights_file);
+  // @@protoc_insertion_point(field_set_allocated:yantk.NetDesc.output_weights_file)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS

@@ -18,5 +18,9 @@ message NetDesc
     optional float learning_rate =3 [default = 0.1] ;
 
     optional bool batch = 4 [default = false] ;
- 
+
+    optional int32 report_frequency = 5 [default = 10000] ;
+
+    optional string output_weights_file = 6 [default = "weights.out" ] ;
+
 }

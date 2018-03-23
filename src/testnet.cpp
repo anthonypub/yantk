@@ -464,6 +464,7 @@ int main(int argc, char** argv)
     float rate = 0.1;
     string act = "sigmoid";
     bool do_batch = false;
+    string output_weights_file;
 
     if(argc == 2)
     {
@@ -491,6 +492,8 @@ int main(int argc, char** argv)
         act = DescNonlinearityToString(desc.nonlinearity());
             
         rate = desc.learning_rate();
+        output_weights_file = desc.output_weights_file();
+
     }
     else
     {
@@ -535,10 +538,14 @@ int main(int argc, char** argv)
     int report_freq = 100000;
     for(int i=0; i < iters; ++i)
     {
+
+        tn.AddWeightsProto(i); 
+        /*
         if(i % report_freq == 0)
         {
             tn.AddWeightsProto(i); 
         }
+        */
         float err = tn.run_all_examples((i % report_freq) == 0 || i == iters - 1, rate, do_batch);
         //float err = tn.run_all_examples(false, rate);
         if((i % report_freq) == 0 || i == iters - 1)
@@ -547,5 +554,5 @@ int main(int argc, char** argv)
         }
     }
 
-    tn.DumpWeights("weights.prototxt");
+    tn.DumpWeights(output_weights_file.c_str());
 }

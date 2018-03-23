@@ -2,3 +2,4 @@ num_iterations: 10
 nonlinearity: SIGMOID
 learning_rate: 0.1
 batch: false
+output_weights_file: "it10_sigmoid_0_10_false.weights"

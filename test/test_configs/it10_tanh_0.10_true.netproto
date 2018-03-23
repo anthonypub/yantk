@@ -1,4 +1,5 @@
-num_iterations: 1
+num_iterations: 10
 nonlinearity: TANH 
 learning_rate: 0.1
 batch: true
+output_weights_file: "it10_tanh_0_10_true.weights"
